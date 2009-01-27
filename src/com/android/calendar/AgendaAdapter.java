@@ -107,6 +107,9 @@ public class AgendaAdapter extends ResourceCursorAdapter {
         boolean hasAlarm = cursor.getInt(AgendaActivity.INDEX_HAS_ALARM) != 0;
         if (hasAlarm) {
             updateReminder(view, context, begin, cursor.getLong(AgendaActivity.INDEX_EVENT_ID));
+        } else {
+            LinearLayout parent = (LinearLayout) view.findViewById(R.id.reminders_container);
+            parent.removeAllViews();
         }
         
         // Where
