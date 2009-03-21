@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (C) 2009 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_label">"Календар"</string>
+    <string name="calendar_plug"><font fgcolor="#ffffffff">"Ласкаво просимо в Календар Google!"</font>" "\n"Засіб Google для управління розкладами, які базуються на ідеї, що планування подій може бути більш ефективним і доступним."</string>
+    <string name="what_label">"Що"</string>
+    <string name="when_label">"Коли"</string>
+    <string name="where_label">"Де"</string>
+    <string name="repeats_label">"Повторювання"</string>
+    <string name="no_title_label">"(Без теми)"</string>
+  <plurals name="Nminutes">
+    <item quantity="one">"1 хвилину"</item>
+    <item quantity="other">"<xliff:g id="COUNT">%d</xliff:g> хв."</item>
+  </plurals>
+  <plurals name="Nmins">
+    <item quantity="one">"1 хв."</item>
+    <item quantity="other">"<xliff:g id="COUNT">%d</xliff:g> хв."</item>
+  </plurals>
+  <plurals name="Nhours">
+    <item quantity="one">"1 година"</item>
+    <item quantity="other">"<xliff:g id="COUNT">%d</xliff:g> год."</item>
+  </plurals>
+  <plurals name="Ndays">
+    <item quantity="one">"1 день"</item>
+    <item quantity="other">"<xliff:g id="COUNT">%d</xliff:g> дн."</item>
+  </plurals>
+    <string name="show_agenda_view">"Показувати в режимі перегляду порядку денного"</string>
+    <string name="show_day_view">"Показати в режимі перегляду дня"</string>
+    <string name="agenda_view">"Порядок денний"</string>
+    <string name="day_view">"День"</string>
+    <string name="week_view">"Тиждень"</string>
+    <string name="month_view">"Місяць"</string>
+    <string name="event_view">"Переглянути подію"</string>
+    <string name="event_create">"Створити подію"</string>
+    <string name="event_edit">"Змінити подію"</string>
+    <string name="event_delete">"Видалити подію"</string>
+    <string name="goto_today">"Сьогодні"</string>
+    <string name="menu_select_calendars">"Мої календарі"</string>
+    <string name="menu_preferences">"Налаштування"</string>
+    <string name="plus_N_more">"(і ще <xliff:g id="MORE_COUNT">%d</xliff:g>)"</string>
+    <string name="calendars_title">"Мої календарі"</string>
+    <string name="add_calendars">"Добавити календарі"</string>
+    <string name="remove_calendars">"Видалення календарів"</string>
+    <string name="event_edit_title">"Дані про події"</string>
+    <string name="hint_what">"Назва події"</string>
+    <string name="hint_where">"Месце події"</string>
+    <string name="hint_description">"Опис події"</string>
+    <string name="creating_event">"Відбувається створення події..."</string>
+    <string name="saving_event">"Відбувається збереження події..."</string>
+    <string name="loading_calendars_title">"Завантаження календарів"</string>
+    <string name="loading_calendars_message">"Відбувається завантаження календарів..."</string>
+    <string name="alert_when_label">"Коли:"</string>
+    <string name="alert_where_label">"Де:"</string>
+    <string name="alert_missed_events_single">"(додаткові інформування: <xliff:g id="REMINDER_COUNT">%s</xliff:g>)"</string>
+    <string name="alert_missed_events_multiple">"(додатвові інформування: <xliff:g id="REMINDER_COUNT">%s</xliff:g>)"</string>
+    <string name="event_info_title">"Перегляд події"</string>
+    <string name="event_info_title_invite">"Запрошення на зустріч"</string>
+    <string name="add_new_reminder">"Додати нагадування"</string>
+    <string name="edit_event_to_label">"до"</string>
+    <string name="edit_event_from_label">"З"</string>
+    <string name="edit_event_all_day_label">"Весь день"</string>
+    <string name="edit_event_calendar_label">"Календар"</string>
+    <string name="edit_event_show_extra_options">"Показати додаткові параметри"</string>
+    <string name="edit_event_hide_extra_options">"Приховати додаткові параметри"</string>
+    <string name="description_label">"Опис"</string>
+    <string name="presence_label">"Наявність"</string>
+    <string name="privacy_label">"Конфіденційність"</string>
+    <string name="reminders_label">"Нагадування"</string>
+    <string name="no_syncable_calendars">"Немає календарів"</string>
+    <string name="no_calendars_found">"Календарі відсутні."</string>
+    <string name="view_event_calendar_label">"Календар"</string>
+    <string name="view_event_timezone_label">"Місцевий часовий пояс"</string>
+    <string name="view_event_response_label">"Відвідаєте?"</string>
+    <string name="agenda_today">"Сьогодні"</string>
+    <string name="num_events">"Кількість подій"</string>
+    <string name="edit_event_label">"Змінити подію"</string>
+    <string name="delete_label">"Видалити"</string>
+    <string name="delete_event_label">"Видалити подію"</string>
+    <string name="save_label">"Зберегти"</string>
+    <string name="discard_label">"Не зберігати зміни"</string>
+    <string name="import_label">"Імпорт"</string>
+    <string name="snooze_all_label">"Відкласти всі"</string>
+    <string name="dismiss_all_label">"Відмінити всі"</string>
+    <string name="does_not_repeat">"Одноразова подія"</string>
+    <string name="daily">"Кожний день"</string>
+    <string name="every_weekday">"Кожний робочий день (понеділок—п'ятниця)"</string>
+    <string name="weekly">"Кожний тиждень (день тижня: <xliff:g id="DAYS_OF_WEEK">%s</xliff:g>)"</string>
+    <string name="monthly_on_day_count">"Кожний місяць (кожн. <xliff:g id="ORDINAL_NUMBER">%1$s</xliff:g> <xliff:g id="DAY_OF_WEEK">%2$s</xliff:g>)"</string>
+    <string name="monthly_on_day">"Кожного місяця (в <xliff:g id="DAY_OF_MONTH">%s</xliff:g> день)"</string>
+    <string name="yearly">"Кожний рік (<xliff:g id="DATES">%s</xliff:g>)"</string>
+    <string name="custom">"Користувацький варіант... (налаштування на телефоні неможливе)"</string>
+    <string name="modify_event">"Змінити тільки цю подію."</string>
+    <string name="modify_all">"Змінити всі події."</string>
+    <string name="modify_all_following">"Змінити цю і всі наступні події"</string>
+    <string name="delete_this_event_title">"Цю подію буде видалено."</string>
+    <string name="delete_title">"Видалити"</string>
+	<string name="change_response_title">"Змінити відповідь"</string>
+    <string name="preferences_title">"Налаштування"</string>
+    <string name="preferences_general_title">"Налаштування режимів перегляду календаря"</string>
+    <string name="preferences_alerts_title">"Налаштування нагадування"</string>
+    <string name="preferences_hide_declined_title">"Приховати відмінену подію"</string>
+    <string name="preferences_alerts_type_title">"Налаштувати сповіщення та інформування"</string>
+    <string name="preferences_alerts_type_dialog">"Сповіщення та інформування"</string>
+    <string name="preferences_alerts_vibrate_title">"Вібросигнал"</string>
+    <string name="preferences_alerts_ringtone_title">"Вибір мелодії дзвінка"</string>
+    <string name="preferences_default_reminder_title">"Встановити нагадування за замовчуванням"</string>
+    <string name="preferences_default_reminder_dialog">"Час нагадування за замовчуванням"</string>
+    <string name="preferences_default_reminder_default">"10"</string>
+</resources>

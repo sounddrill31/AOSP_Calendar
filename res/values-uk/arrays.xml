@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (C) 2009 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string-array name="reminder_minutes_labels">
+    <item>"5 хвилин"</item>
+    <item>"10 хвилин"</item>
+    <item>"15 хвилин"</item>
+    <item>"20 хвилин"</item>
+    <item>"25 хвилин"</item>
+    <item>"30 хвилин"</item>
+    <item>"45 хвилин"</item>
+    <item>"1 година"</item>
+    <item>"2 години"</item>
+    <item>"3 години"</item>
+    <item>"12 годин"</item>
+    <item>"24 години"</item>
+    <item>"2 дні"</item>
+    <item>"1 тиждень"</item>
+  </string-array>
+  <string-array name="preferences_default_reminder_labels">
+    <item>"Ні"</item>
+    <item>"5 хвилин"</item>
+    <item>"10 хвилин"</item>
+    <item>"15 хвилин"</item>
+    <item>"20 хвилин"</item>
+    <item>"25 хвилин"</item>
+    <item>"30 хвилин"</item>
+    <item>"45 хвилин"</item>
+    <item>"1 година"</item>
+    <item>"2 години"</item>
+    <item>"3 години"</item>
+    <item>"12 годин"</item>
+    <item>"24 години"</item>
+    <item>"2 дні"</item>
+    <item>"1 тиждень"</item>
+  </string-array>
+  <string-array name="preferences_alert_type_labels">
+    <item>"Сповіщення"</item>
+    <item>"Інформування в стрічці стану"</item>
+    <item>"Вимк"</item>
+  </string-array>
+  <string-array name="availability">
+    <item>"Зайнято"</item>
+    <item>"Вільно"</item>
+  </string-array>
+  <string-array name="visibility">
+    <item>"За замовчуванням"</item>
+    <item>"Закрит."</item>
+    <item>"Відкрит."</item>
+  </string-array>
+  <string-array name="day_labels">
+    <item>"Неділя"</item>
+    <item>"Понеділок"</item>
+    <item>"Вівторок"</item>
+    <item>"Середа"</item>
+    <item>"Четвер"</item>
+    <item>"П'ятниця"</item>
+    <item>"Субота"</item>
+  </string-array>
+  <string-array name="ordinal_labels">
+    <item>"перш."</item>
+    <item>"друг."</item>
+    <item>"трет."</item>
+    <item>"четверт."</item>
+    <item>"ост."</item>
+  </string-array>
+  <string-array name="response_labels1">
+    <item>"(немає відповіді)"</item>
+    <item>"Так"</item>
+    <item>"Може бути"</item>
+    <item>"Ні"</item>
+  </string-array>
+  <string-array name="response_labels2">
+    <item>"Так"</item>
+    <item>"Можливо"</item>
+    <item>"Ні"</item>
+  </string-array>
+  <string-array name="delete_repeating_labels">
+    <item>"Тілький ця подія"</item>
+    <item>"Ця і наступні події"</item>
+    <item>"Усі події"</item>
+  </string-array>
+  <string-array name="delete_repeating_labels_no_selected">
+    <item>"Ця і наступні події"</item>
+    <item>"Усі події"</item>
+  </string-array>
+  <string-array name="change_response_labels">
+    <item>"Тільки цей екземпляр"</item>
+    <item>"Усі екземпляри подій"</item>
+  </string-array>
+</resources>
