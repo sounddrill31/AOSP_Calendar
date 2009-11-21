@@ -2220,7 +2220,7 @@ public class CalendarView extends View
 
 	StaticLayout layout=new StaticLayout( text, 0, text.length(), new TextPaint(p), (int)rf.width()-2,
 		Alignment.ALIGN_NORMAL, (float)1, (float)0.0, true, TextUtils.TruncateAt.END,
-	       	MAX_EVENT_TEXT_LEN );
+	       	(int)rf.width() );
 	
 	layout.draw( canvas );
 
