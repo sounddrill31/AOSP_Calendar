@@ -581,13 +581,8 @@ public class EditEvent extends Activity implements View.OnClickListener,
                 Log.w(TAG, "Ignoring unexpected exception", e);
             } catch (AuthenticatorException e) {
                 Log.w(TAG, "Ignoring unexpected exception", e);
-            } finally {
-                if (primaryCalendarPosition != -1) {
-                    return primaryCalendarPosition;
-                } else {
-                    return 0;
-                }
             }
+            return (primaryCalendarPosition >= 0) ? primaryCalendarPosition : 0;
         }
     }
 
