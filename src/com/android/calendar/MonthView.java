@@ -27,12 +27,15 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Shader.TileMode;
 import android.graphics.Paint.Style;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.Calendar.Attendees;
@@ -75,7 +78,7 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
     private static int EVENT_DOT_W_H = 10;
     private static int EVENT_NUM_DAYS = 31;
     private static int TEXT_TOP_MARGIN = 7;
-    private static int BUSY_BITS_WIDTH = 6;
+    private static int BUSY_BITS_WIDTH = 8;
     private static int BUSY_BITS_MARGIN = 4;
     private static int DAY_NUMBER_OFFSET = 10;
 
@@ -228,7 +231,7 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
         mViewCalendar.monthDay = 1;
         long millis = mViewCalendar.normalize(true /* ignore DST */);
         mFirstJulianDay = Time.getJulianDay(millis, mViewCalendar.gmtoff);
-        mStartDay = Utils.getFirstDayOfWeek();
+        mStartDay = Utils.getFirstDayOfWeek(getContext());
         mViewCalendar.set(now);
 
         mCursor = new DayOfMonthCursor(mViewCalendar.year,  mViewCalendar.month,
@@ -768,7 +771,7 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
                 background.draw(canvas);
             }
             //Places events for that day
-            drawEvents(day, canvas, r, p, !isToday /*draw bb background*/);
+            drawEvents(day, canvas, r, p, true /*draw bb background*/);
         }
 
         // Draw week number
@@ -829,7 +832,17 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
                 p.setColor(mMonthDayNumberColor);
             }
             //bolds the day if there's an event that day
-            p.setFakeBoldText(eventDay[day-mFirstJulianDay]);
+           	p.setFakeBoldText(false);
+        	ArrayList<Event> events = mEvents;
+			if (eventDay[day-mFirstJulianDay]) {
+				for(int e = 0;e < events.size();e++) {
+            		Event event = events.get(e);
+					if (event.startDay <= day && event.endDay >= day && event.allDay) {
+            			p.setFakeBoldText(true);
+						p.setColor(event.color);
+					}
+				}
+			}
         }
         /*Drawing of day number is done here
          *easy to find tags draw number draw day*/
@@ -862,8 +875,14 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
 
             p.setColor(mMonthBgColor);
             p.setStyle(Style.FILL);
-            canvas.drawRect(rf, p);
+			//added rounded corners to events
+            canvas.drawRoundRect(rf, 5, 5, p);
         }
+
+		//Draw BusyBits backgrouind for 3D effect
+		Bitmap bmp=((BitmapDrawable) getResources().getDrawable(R.drawable.dna_empty) ).getBitmap();
+		bmp = bmp.createScaledBitmap(bmp,BUSY_BITS_WIDTH,(rect.bottom - BUSY_BITS_MARGIN - top),false);
+		canvas.drawBitmap( bmp, left - 1, top, p);
 
         for (int i = 0; i < numEvents; i++) {
             Event event = events.get(i);
@@ -872,13 +891,14 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
             }
             drawEventRect(rect, event, canvas, p);
         }
+		
 
     }
 
     // Draw busybits for a single event
     private RectF drawEventRect(Rect rect, Event event, Canvas canvas, Paint p) {
-
-        p.setColor(mBusybitsColor);
+		//Set calendar color to event color
+		p.setColor(event.color);
 
         int left = rect.right - BUSY_BITS_MARGIN - BUSY_BITS_WIDTH;
         int bottom = rect.bottom - BUSY_BITS_MARGIN;
@@ -890,7 +910,7 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
         rf.left = left;
         rf.right = left + BUSY_BITS_WIDTH;
 
-        canvas.drawRect(rf, p);
+        canvas.drawRoundRect(rf,5,5,p);
 
         return rf;
     }
