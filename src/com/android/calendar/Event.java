@@ -35,7 +35,7 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // TODO: should Event be Parcelable so it can be passed via Intents?
-public class Event implements Comparable<Event>, Cloneable {
+public class Event implements Comparable, Cloneable {
 
     private static final boolean PROFILE = false;
 
@@ -117,6 +117,8 @@ public class Event implements Comparable<Event>, Cloneable {
     public Event nextUp;
     public Event nextDown;
 
+    private static final int MIDNIGHT_IN_MINUTES = 24 * 60;
+
     @Override
     public final Object clone() throws CloneNotSupportedException {
         super.clone();
@@ -185,30 +187,32 @@ public class Event implements Comparable<Event>, Cloneable {
      * Compares this event to the given event.  This is just used for checking
      * if two events differ.  It's not used for sorting anymore.
      */
-    public final int compareTo(Event obj) {
+    public final int compareTo(Object obj) {
+        Event e = (Event) obj;
+
         // The earlier start day and time comes first
-        if (startDay < obj.startDay) return -1;
-        if (startDay > obj.startDay) return 1;
-        if (startTime < obj.startTime) return -1;
-        if (startTime > obj.startTime) return 1;
+        if (startDay < e.startDay) return -1;
+        if (startDay > e.startDay) return 1;
+        if (startTime < e.startTime) return -1;
+        if (startTime > e.startTime) return 1;
 
         // The later end time comes first (in order to put long strips on
         // the left).
-        if (endDay < obj.endDay) return 1;
-        if (endDay > obj.endDay) return -1;
-        if (endTime < obj.endTime) return 1;
-        if (endTime > obj.endTime) return -1;
+        if (endDay < e.endDay) return 1;
+        if (endDay > e.endDay) return -1;
+        if (endTime < e.endTime) return 1;
+        if (endTime > e.endTime) return -1;
 
         // Sort all-day events before normal events.
-        if (allDay && !obj.allDay) return -1;
-        if (!allDay && obj.allDay) return 1;
+        if (allDay && !e.allDay) return -1;
+        if (!allDay && e.allDay) return 1;
 
-        if (guestsCanModify && !obj.guestsCanModify) return -1;
-        if (!guestsCanModify && obj.guestsCanModify) return 1;
+        if (guestsCanModify && !e.guestsCanModify) return -1;
+        if (!guestsCanModify && e.guestsCanModify) return 1;
 
         // If two events have the same time range, then sort them in
         // alphabetical order based on their titles.
-        int cmp = compareStrings(title, obj.title);
+        int cmp = compareStrings(title, e.title);
         if (cmp != 0) {
             return cmp;
         }
@@ -216,12 +220,12 @@ public class Event implements Comparable<Event>, Cloneable {
         // If the titles are the same then compare the other fields
         // so that we can use this function to check for differences
         // between events.
-        cmp = compareStrings(location, obj.location);
+        cmp = compareStrings(location, e.location);
         if (cmp != 0) {
             return cmp;
         }
 
-        cmp = compareStrings(organizer, obj.organizer);
+        cmp = compareStrings(organizer, e.organizer);
         if (cmp != 0) {
             return cmp;
         }

@@ -392,7 +392,7 @@ public class CalendarView extends View
         setClickable(true);
         setOnCreateContextMenuListener(this);
 
-        mStartDay = Utils.getFirstDayOfWeek();
+        mStartDay = Utils.getFirstDayOfWeek(context);
 
         mCurrentTime = new Time();
         long currentTime = System.currentTimeMillis();
@@ -2439,6 +2439,7 @@ public class CalendarView extends View
     void doSingleTapUp(MotionEvent ev) {
         int x = (int) ev.getX();
         int y = (int) ev.getY();
+        Event selectedEvent = mSelectedEvent;
         int selectedDay = mSelectionDay;
         int selectedHour = mSelectionHour;
 

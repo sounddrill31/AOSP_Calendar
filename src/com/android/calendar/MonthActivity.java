@@ -43,6 +43,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 import android.widget.Gallery.LayoutParams;
+import android.util.Log;
 
 import java.util.Calendar;
 
@@ -223,12 +224,16 @@ public class MonthActivity extends Activity implements ViewSwitcher.ViewFactory,
         mTime.set(time);
         mTime.normalize(true);
 
-        // Get first day of week based on locale and populate the day headers
-        mStartDay = Calendar.getInstance().getFirstDayOfWeek();
+        // Get first day of week based on preference settings
+		SharedPreferences prefs = CalendarPreferenceActivity.getSharedPreferences(this);
+		String str = prefs.getString(CalendarPreferenceActivity.KEY_WEEK_START_DAY,"1");
+        mStartDay = Integer.parseInt(str);
         int diff = mStartDay - Calendar.SUNDAY - 1;
-        final int startDay = Utils.getFirstDayOfWeek();
+        final int startDay = Utils.getFirstDayOfWeek(this);
         final int sundayColor = getResources().getColor(R.color.sunday_text_color);
         final int saturdayColor = getResources().getColor(R.color.saturday_text_color);
+
+		Log.e("CALENDAR", "" + mStartDay + "  == " + startDay);
 
         for (int day = 0; day < 7; day++) {
             final String dayString = DateUtils.getDayOfWeekString(
