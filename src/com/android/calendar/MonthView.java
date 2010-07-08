@@ -60,7 +60,6 @@ import java.util.Calendar;
 public class MonthView extends View implements View.OnCreateContextMenuListener {
 
     private static final boolean PROFILE_LOAD_TIME = false;
-
     private static float mScale = 0; // Used for supporting different screen densities
     private static int WEEK_GAP = 0;
     private static int MONTH_DAY_GAP = 1;
