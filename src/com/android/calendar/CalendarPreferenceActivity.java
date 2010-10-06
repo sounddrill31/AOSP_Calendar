@@ -28,13 +28,13 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.RingtonePreference;
-
+import android.app.backup.BackupManager;
 public class CalendarPreferenceActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener {
     private static final String BUILD_VERSION = "build_version";
 
     // The name of the shared preferences file. This name must be maintained for historical
     // reasons, as it's what PreferenceManager assigned the first time the file was created.
-    private static final String SHARED_PREFS_NAME = "com.android.calendar_preferences";
+    static final String SHARED_PREFS_NAME = "com.android.calendar_preferences";
 
     // Preference keys
     static final String KEY_HIDE_DECLINED = "preferences_hide_declined";
@@ -114,6 +114,7 @@ public class CalendarPreferenceActivity extends PreferenceActivity implements On
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(KEY_ALERTS_TYPE)) {
             updateChildPreferences();
+            BackupManager.dataChanged(this.getPackageName());
         }
     }
 
