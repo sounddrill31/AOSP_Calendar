@@ -29,8 +29,11 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.RingtonePreference;
 import android.app.backup.BackupManager;
+import android.util.Log;
 public class CalendarPreferenceActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener {
     private static final String BUILD_VERSION = "build_version";
+
+    private static final String TAG = "CalendarPreferenceActivity";
 
     // The name of the shared preferences file. This name must be maintained for historical
     // reasons, as it's what PreferenceManager assigned the first time the file was created.
@@ -114,8 +117,9 @@ public class CalendarPreferenceActivity extends PreferenceActivity implements On
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(KEY_ALERTS_TYPE)) {
             updateChildPreferences();
-            BackupManager.dataChanged(this.getPackageName());
         }
+	Log.v(TAG, "onSharedPreferenceChanged:" + this.getPackageName());
+	BackupManager.dataChanged(this.getPackageName());
     }
 
     private void updateChildPreferences() {

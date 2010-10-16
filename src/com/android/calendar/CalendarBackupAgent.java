@@ -9,6 +9,6 @@ public class CalendarBackupAgent extends BackupAgentHelper
 
     public void onCreate () {
         addHelper(SHARED_KEY, new SharedPreferencesBackupHelper(this,
-                                                                CalendarPreferenceActivity.SHARED_PREFS_NAME));
+                CalendarPreferenceActivity.SHARED_PREFS_NAME));
     }
 }
