@@ -43,6 +43,10 @@ import android.provider.Calendar.Attendees;
 import android.provider.Calendar.Calendars;
 import android.provider.Calendar.Events;
 import android.text.TextUtils;
+import android.text.StaticLayout;
+import android.text.Layout.Alignment;
+import android.text.TextPaint;
+import android.text.TextUtils.TruncateAt;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.text.format.Time;
@@ -159,6 +163,7 @@ public class CalendarView extends View
     private long mLastReloadMillis;
 
     private ArrayList<Event> mEvents = new ArrayList<Event>();
+    private ArrayList<StaticLayout> mLayouts = new ArrayList<StaticLayout>();
     private int mSelectionDay;        // Julian day
     private int mSelectionHour;
 
@@ -294,6 +299,11 @@ public class CalendarView extends View
     private boolean mComputeSelectedEvents;
     private Event mSelectedEvent;
     private Event mPrevSelectedEvent;
+    /*
+     * Cache of mSelectedEvent's corresponding StaticLayout. Set this to null whenever you change
+     * mSelectedEvent.
+     */
+    private StaticLayout mSelectedLayout;
     private Rect mPrevBox = new Rect();
     protected final Resources mResources;
     private String mAmString;
@@ -570,6 +580,7 @@ public class CalendarView extends View
         mBaseDate.set(time);
         mSelectionHour = mBaseDate.hour;
         mSelectedEvent = null;
+        mSelectedLayout = null;
         mPrevSelectedEvent = null;
         long millis = mBaseDate.toMillis(false /* use isDst */);
         mSelectionDay = Time.getJulianDay(millis, mBaseDate.gmtoff);
@@ -814,6 +825,7 @@ public class CalendarView extends View
         view.remeasure(getWidth(), getHeight());
 
         view.mSelectedEvent = null;
+        view.mSelectedLayout = null;
         view.mPrevSelectedEvent = null;
         view.mStartDay = mStartDay;
         if (view.mEvents.size() > 0) {
@@ -1011,6 +1023,7 @@ public class CalendarView extends View
         case KeyEvent.KEYCODE_DPAD_LEFT:
             if (mSelectedEvent != null) {
                 mSelectedEvent = mSelectedEvent.nextLeft;
+                mSelectedLayout = null;
             }
             if (mSelectedEvent == null) {
                 mLastPopupEventID = INVALID_EVENT_ID;
@@ -1022,6 +1035,7 @@ public class CalendarView extends View
         case KeyEvent.KEYCODE_DPAD_RIGHT:
             if (mSelectedEvent != null) {
                 mSelectedEvent = mSelectedEvent.nextRight;
+                mSelectedLayout = null;
             }
             if (mSelectedEvent == null) {
                 mLastPopupEventID = INVALID_EVENT_ID;
@@ -1033,6 +1047,7 @@ public class CalendarView extends View
         case KeyEvent.KEYCODE_DPAD_UP:
             if (mSelectedEvent != null) {
                 mSelectedEvent = mSelectedEvent.nextUp;
+                mSelectedLayout = null;
             }
             if (mSelectedEvent == null) {
                 mLastPopupEventID = INVALID_EVENT_ID;
@@ -1049,6 +1064,7 @@ public class CalendarView extends View
         case KeyEvent.KEYCODE_DPAD_DOWN:
             if (mSelectedEvent != null) {
                 mSelectedEvent = mSelectedEvent.nextDown;
+                mSelectedLayout = null;
             }
             if (mSelectedEvent == null) {
                 mLastPopupEventID = INVALID_EVENT_ID;
@@ -1107,11 +1123,13 @@ public class CalendarView extends View
         if (mSelectionHour < mFirstHour + 1) {
             mSelectionHour = mFirstHour + 1;
             mSelectedEvent = null;
+            mSelectedLayout = null;
             mSelectedEvents.clear();
             mComputeSelectedEvents = true;
         } else if (mSelectionHour > mFirstHour + mNumHours - 3) {
             mSelectionHour = mFirstHour + mNumHours - 3;
             mSelectedEvent = null;
+            mSelectedLayout = null;
             mSelectedEvents.clear();
             mComputeSelectedEvents = true;
         }
@@ -1213,6 +1231,8 @@ public class CalendarView extends View
         mPrevSelectedEvent = null;
         mSelectedEvents.clear();
 
+        mSelectedLayout = null;
+
         // The start date is the beginning of the week at 12am
         Time weekStart = new Time();
         weekStart.set(mBaseDate);
@@ -1233,6 +1253,11 @@ public class CalendarView extends View
         mEventLoader.loadEventsInBackground(mNumDays, events, millis, new Runnable() {
             public void run() {
                 mEvents = events;
+                mLayouts = new ArrayList<StaticLayout>(events.size()); // New events, new layouts
+                // Fill the layouts with nulls
+                while (mLayouts.size() < events.size()) {
+                    mLayouts.add(null);
+                }
                 mRemeasure = true;
                 mRedrawScreen = true;
                 mComputeSelectedEvents = true;
@@ -1681,6 +1706,45 @@ public class CalendarView extends View
         return box;
     }
 
+    /**
+     * Return the layout for a numbered event. Create it if not already existing
+     */
+    private StaticLayout getEventLayout(int i, Event event, Paint paint, RectF rf) {
+        StaticLayout layout = mLayouts.get(i);
+
+        // Check if we have already initialized the StaticLayout
+        if (layout == null) {
+            // No, we haven't...
+            String text = event.getTitleAndLocation();
+
+            // XXX Is this really needed when working with a StaticLayout?
+            text = drawTextSanitizer(text);
+
+            // Leave a one pixel boundary on the left and right of the rectangle for the event
+            layout = new StaticLayout(text, 0, text.length(), new TextPaint(paint),
+                    (int) rf.width() - 2, Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true,
+                    TextUtils.TruncateAt.END, (int) rf.width() - 2);
+
+            mLayouts.set(i, layout);
+        }
+
+        return layout;
+    }
+
+    /**
+     * Return the layout matching the currently selected event.
+     */
+    private StaticLayout getSelectedLayout(Paint paint, RectF rf) {
+        if (mSelectedLayout != null) {
+            return mSelectedLayout;
+        }
+
+        int index = mEvents.indexOf(mSelectedEvent);
+        mSelectedLayout = getEventLayout(index, mSelectedEvent, paint, rf);
+
+        return mSelectedLayout;
+    }
+
     private void drawAllDayEvents(int firstDay, int numDays,
             Rect r, Canvas canvas, Paint p) {
         p.setTextSize(NORMAL_FONT_SIZE);
@@ -1755,7 +1819,8 @@ public class CalendarView extends View
             event.bottom = event.top + height * 0.9f;
 
             RectF rf = drawAllDayEventRect(event, canvas, p, eventTextPaint);
-            drawEventText(event, rf, canvas, eventTextPaint, ALL_DAY_TEXT_TOP_MARGIN);
+            StaticLayout layout = getEventLayout(i, event, eventTextPaint, rf);
+            drawEventText(layout, rf, canvas, eventTextPaint, ALL_DAY_TEXT_TOP_MARGIN);
 
             // Check if this all-day event intersects the selected day
             if (mSelectionAllDay && mComputeSelectedEvents) {
@@ -1772,7 +1837,8 @@ public class CalendarView extends View
             if (mSelectedEvent != null) {
                 Event event = mSelectedEvent;
                 RectF rf = drawAllDayEventRect(event, canvas, p, eventTextPaint);
-                drawEventText(event, rf, canvas, eventTextPaint, ALL_DAY_TEXT_TOP_MARGIN);
+                StaticLayout layout = getSelectedLayout(eventTextPaint, rf);
+                drawEventText(layout, rf, canvas, eventTextPaint, ALL_DAY_TEXT_TOP_MARGIN);
             }
 
             // Draw the highlight on the selected all-day area
@@ -1852,6 +1918,7 @@ public class CalendarView extends View
         } else {
             mSelectedEvent = maxPositionEvent;
         }
+        mSelectedLayout = null;
     }
 
     RectF drawAllDayEventRect(Event event, Canvas canvas, Paint p, Paint eventTextPaint) {
@@ -1907,7 +1974,8 @@ public class CalendarView extends View
             }
 
             RectF rf = drawEventRect(event, canvas, p, eventTextPaint);
-            drawEventText(event, rf, canvas, eventTextPaint, NORMAL_TEXT_TOP_MARGIN);
+            StaticLayout layout = getEventLayout(i, event, eventTextPaint, rf);
+            drawEventText(layout, rf, canvas, eventTextPaint, NORMAL_TEXT_TOP_MARGIN);
         }
 
         if (date == mSelectionDay && !mSelectionAllDay && isFocused()
@@ -1915,7 +1983,8 @@ public class CalendarView extends View
             computeNeighbors();
             if (mSelectedEvent != null) {
                 RectF rf = drawEventRect(mSelectedEvent, canvas, p, eventTextPaint);
-                drawEventText(mSelectedEvent, rf, canvas, eventTextPaint, NORMAL_TEXT_TOP_MARGIN);
+                StaticLayout layout = getSelectedLayout(eventTextPaint, rf);
+                drawEventText(layout, rf, canvas, eventTextPaint, NORMAL_TEXT_TOP_MARGIN);
             }
         }
     }
@@ -2205,6 +2274,7 @@ public class CalendarView extends View
             ev.nextRight = rightEvent;
         }
         mSelectedEvent = startEvent;
+        mSelectedLayout = null;
     }
 
 
@@ -2285,7 +2355,7 @@ public class CalendarView extends View
         return string;
     }
 
-    private void drawEventText(Event event, RectF rf, Canvas canvas, Paint p, int topMargin) {
+    private void drawEventText(StaticLayout eventLayout, RectF rf, Canvas canvas, Paint p, int topMargin) {
         if (!mDrawTextInEventRect) {
             return;
         }
@@ -2301,78 +2371,15 @@ public class CalendarView extends View
             return;
         }
 
-        // Truncate the event title to a known (large enough) limit
-        String text = event.getTitleAndLocation();
+        // Use a StaticLayout to format the string.
+        canvas.save();
+        canvas.translate(rf.left + 1, rf.top ); // So the layout draw happens at the right place
+        // When creating the layout, we defined a width that was -2 from the rect to leave a border.
+        // We now draw at +1 so that border will be equal on the right and left.
 
-        text = drawTextSanitizer(text);
+        eventLayout.draw(canvas);
 
-        int len = text.length();
-        if (len > MAX_EVENT_TEXT_LEN) {
-            text = text.substring(0, MAX_EVENT_TEXT_LEN);
-            len = MAX_EVENT_TEXT_LEN;
-        }
-
-        // Figure out how much space the event title will take, and create a
-        // String fragment that will fit in the rectangle.  Use multiple lines,
-        // if available.
-        p.getTextWidths(text, mCharWidths);
-        String fragment = text;
-        float top = rf.top + mEventTextAscent + topMargin;
-        int start = 0;
-
-        // Leave one pixel extra space at the bottom
-        while (start < len && height >= (lineHeight + 1)) {
-            boolean lastLine = (height < 2 * lineHeight + 1);
-            // Skip leading spaces at the beginning of each line
-            do {
-                char c = text.charAt(start);
-                if (c != ' ') break;
-                start += 1;
-            } while (start < len);
-
-            float sum = 0;
-            int end = start;
-            for (int ii = start; ii < len; ii++) {
-                char c = text.charAt(ii);
-
-                // If we found the end of a word, then remember the ending
-                // position.
-                if (c == ' ') {
-                    end = ii;
-                }
-                sum += mCharWidths[ii];
-                // If adding this character would exceed the width and this
-                // isn't the last line, then break the line at the previous
-                // word.  If there was no previous word, then break this word.
-                if (sum > width) {
-                    if (end > start && !lastLine) {
-                        // There was a previous word on this line.
-                        fragment = text.substring(start, end);
-                        start = end;
-                        break;
-                    }
-
-                    // This is the only word and it is too long to fit on
-                    // the line (or this is the last line), so take as many
-                    // characters of this word as will fit.
-                    fragment = text.substring(start, ii);
-                    start = ii;
-                    break;
-                }
-            }
-
-            // If sum <= width, then we can fit the rest of the text on
-            // this line.
-            if (sum <= width) {
-                fragment = text.substring(start, len);
-                start = len;
-            }
-
-            canvas.drawText(fragment, rf.left + 1, top, p);
-
-            top += lineHeight;
-            height -= lineHeight;
-        }
+        canvas.restore();
     }
 
     private void updateEventDetails() {
@@ -2965,6 +2972,7 @@ public class CalendarView extends View
         int left = mHoursWidth + (mSelectionDay - mFirstJulianDay) * (cellWidth + DAY_GAP);
         int top = 0;
         mSelectedEvent = null;
+        mSelectedLayout = null;
 
         mSelectedEvents.clear();
         if (mSelectionAllDay) {
@@ -3052,6 +3060,7 @@ public class CalendarView extends View
                 }
             }
             mSelectedEvent = closestEvent;
+            mSelectedLayout = null;
 
             // Keep the selected hour and day consistent with the selected
             // event.  They could be different if we touched on an empty hour
