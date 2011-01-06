@@ -55,6 +55,7 @@
     <color name="month_other_month_banner">#80595959</color>
     <color name="month_week_banner">#FFDDDDDD</color>
     <color name="month_busybits">#FF6090F0</color>
+    <color name="month_busybitsbgcolor">#FFFFFFFF</color>
     <color name="month_bgcolor">#FFDDDDDD</color>
 
     <color name="event_center">#ff6bd697</color>
