@@ -16,12 +16,16 @@
 
 package com.android.calendar;
 
+import java.util.Formatter;
+import java.util.Locale;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
+import android.text.format.Time;
 import android.view.View;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
@@ -84,17 +88,20 @@ public class AlertAdapter extends ResourceCursorAdapter {
         
         // When
         String when;
-        int flags;
+        int flags = DateUtils.FORMAT_SHOW_DATE;
+        String tz;
         if (allDay) {
-            flags = DateUtils.FORMAT_UTC | DateUtils.FORMAT_SHOW_WEEKDAY |
-                    DateUtils.FORMAT_SHOW_DATE;
+            flags |= DateUtils.FORMAT_SHOW_WEEKDAY;
+            tz = Time.TIMEZONE_UTC;
         } else {
-            flags = DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE;
+            flags |= DateUtils.FORMAT_SHOW_TIME;
+            tz = Utils.getTimeZone(context, null);
         }
         if (DateFormat.is24HourFormat(context)) {
             flags |= DateUtils.FORMAT_24HOUR;
         }
-        when = Utils.formatDateRange(context, startMillis, endMillis, flags);
+        Formatter f = new Formatter(new StringBuilder(50), Locale.getDefault());
+        when = DateUtils.formatDateRange(context, f, startMillis, endMillis, flags, tz).toString();
         textView = (TextView) view.findViewById(R.id.when);
         textView.setText(when);
         

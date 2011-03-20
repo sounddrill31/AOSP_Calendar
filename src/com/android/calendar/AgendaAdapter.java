@@ -16,6 +16,9 @@
 
 package com.android.calendar;
 
+import java.util.Formatter;
+import java.util.Locale;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -23,6 +26,7 @@ import android.provider.Calendar.Attendees;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
+import android.text.format.Time;
 import android.view.View;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
@@ -96,18 +100,21 @@ public class AgendaAdapter extends ResourceCursorAdapter {
         long begin = cursor.getLong(AgendaWindowAdapter.INDEX_BEGIN);
         long end = cursor.getLong(AgendaWindowAdapter.INDEX_END);
         boolean allDay = cursor.getInt(AgendaWindowAdapter.INDEX_ALL_DAY) != 0;
-        int flags;
+        int flags = 0;
         String whenString;
+        String tz;
         if (allDay) {
-            flags = DateUtils.FORMAT_UTC;
+            tz = Time.TIMEZONE_UTC;
         } else {
             flags = DateUtils.FORMAT_SHOW_TIME;
+            tz = Utils.getTimeZone(context, null);
         }
         if (DateFormat.is24HourFormat(context)) {
             flags |= DateUtils.FORMAT_24HOUR;
         }
 
-        whenString = Utils.formatDateRange(context, begin, end, flags).toString();
+        Formatter f = new Formatter(new StringBuilder(50), Locale.getDefault());
+        whenString = DateUtils.formatDateRange(context, f, begin, end, flags, tz).toString();
         when.setText(whenString);
 
         String rrule = cursor.getString(AgendaWindowAdapter.INDEX_RRULE);

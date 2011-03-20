@@ -65,7 +65,7 @@ public class Event implements Comparable<Event>, Cloneable {
     private static final int PROJECTION_LOCATION_INDEX = 1;
     private static final int PROJECTION_ALL_DAY_INDEX = 2;
     private static final int PROJECTION_COLOR_INDEX = 3;
-    private static final int PROJECTION_TIMEZONE_INDEX = 4;
+    // private static final int PROJECTION_TIMEZONE_INDEX = 4;
     private static final int PROJECTION_EVENT_ID_INDEX = 5;
     private static final int PROJECTION_BEGIN_INDEX = 6;
     private static final int PROJECTION_END_INDEX = 7;
@@ -421,13 +421,13 @@ public class Event implements Comparable<Event>, Cloneable {
                 continue;
 
             long start = event.getStartMillis();
-            if (false && event.allDay) {
+            /* if (event.allDay) {
                 Event e = event;
                 Log.i("Cal", "event start,end day: " + e.startDay + "," + e.endDay
                         + " start,end time: " + e.startTime + "," + e.endTime
                         + " start,end millis: " + e.getStartMillis() + "," + e.getEndMillis()
                         + " "  + e.title);
-            }
+            } */
 
             // Remove the inactive events.
             // An event on the active list becomes inactive when its end time + margin time is less
@@ -439,13 +439,13 @@ public class Event implements Comparable<Event>, Cloneable {
                 final long duration = Math.max(active.getEndMillis() - active.getStartMillis(),
                         CalendarView.EVENT_OVERWRAP_MARGIN_TIME);
                 if ((active.getStartMillis() + duration) <= start) {
-                    if (false && event.allDay) {
+                    /* if (event.allDay) {
                         Event e = active;
                         Log.i("Cal", "  removing: start,end day: " + e.startDay + "," + e.endDay
                                 + " start,end time: " + e.startTime + "," + e.endTime
                                 + " start,end millis: " + e.getStartMillis() + "," + e.getEndMillis()
                                 + " "  + e.title);
-                    }
+                    } */
                     colMask &= ~(1L << active.getColumn());
                     iter.remove();
                 }

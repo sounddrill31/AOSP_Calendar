@@ -115,7 +115,7 @@ public class SelectCalendarsAdapter extends CursorTreeAdapter implements View.On
     };
     //Keep these in sync with the projection
     private static final int ID_COLUMN = 0;
-    private static final int ACCOUNT_COLUMN = 1;
+    // private static final int ACCOUNT_COLUMN = 1;
     private static final int OWNER_COLUMN = 2;
     private static final int NAME_COLUMN = 3;
     private static final int COLOR_COLUMN = 4;
@@ -177,7 +177,6 @@ public class SelectCalendarsAdapter extends CursorTreeAdapter implements View.On
     public void onClick(View v) {
         View view = (View)v.getTag();
         long id = (Long)view.getTag();
-        Uri uri = ContentUris.withAppendedId(Calendars.CONTENT_URI, id);
         String status = syncedNotVisible;
         Boolean[] change;
         Boolean[] initialState = mCalendarInitialStates.get(id);

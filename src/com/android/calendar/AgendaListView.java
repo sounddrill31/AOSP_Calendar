@@ -74,7 +74,6 @@ public class AgendaListView extends ListView implements OnItemClickListener {
     @Override
     public boolean dispatchPopulateAccessibilityEvent(AccessibilityEvent event) {
         int titlePosition = 0 ;
-        AgendaByDayAdapter.RowInfo rowInfo = null;
         // find the index of the item with day title
         for (titlePosition = getSelectedItemPosition() - 1; titlePosition >= 0; titlePosition--) {
             Object previousItem = mWindowAdapter.getItem(titlePosition);

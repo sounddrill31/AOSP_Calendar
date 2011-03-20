@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Utils {
-    private static final boolean DEBUG = true;
-    private static final String TAG = "CalUtils";
+    // private static final boolean DEBUG = true;
+    // private static final String TAG = "CalUtils";
     private static final int CLEAR_ALPHA_MASK = 0x00FFFFFF;
     private static final int HIGH_ALPHA = 255 << 24;
     private static final int MED_ALPHA = 180 << 24;

@@ -47,7 +47,6 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.text.format.Time;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -67,6 +66,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Formatter;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -276,7 +276,6 @@ public class CalendarView extends View
     /* package */ static long EVENT_OVERWRAP_MARGIN_TIME = MILLIS_PER_MINUTE * 15;
 
     private static int mSelectionColor;
-    private static int mPressedColor;
     private static int mSelectedEventTextColor;
     private static int mEventTextColor;
     private static int mWeek_saturdayColor;
@@ -467,7 +466,6 @@ public class CalendarView extends View
         mCalendarHourLabel = mResources.getColor(R.color.calendar_hour_label);
         mCalendarHourSelected = mResources.getColor(R.color.calendar_hour_selected);
         mSelectionColor = mResources.getColor(R.color.selection);
-        mPressedColor = mResources.getColor(R.color.pressed);
         mSelectedEventTextColor = mResources.getColor(R.color.calendar_event_selected_text_color);
         mEventTextColor = mResources.getColor(R.color.calendar_event_text_color);
         mCurrentTimeMarkerColor = mResources.getColor(R.color.current_time_marker);
@@ -697,7 +695,6 @@ public class CalendarView extends View
             }
             start = System.currentTimeMillis();
 
-            String tz = Utils.getTimeZone(mContext, mUpdateTZ);
             boolean isDST = mBaseDate.isDst != 0;
             StringBuilder title = new StringBuilder(mDateRange);
             title.append(" (").append(Utils.formatDateRange(mContext, start, start, flags))
@@ -2224,7 +2221,7 @@ public class CalendarView extends View
             if (bottom > box.bottom) {
                 bottom = box.bottom;
             }
-            if (false) {
+            /* if (false) {
                 int flags = DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_ABBREV_ALL
                         | DateUtils.FORMAT_CAP_NOON_MIDNIGHT;
                 if (DateFormat.is24HourFormat(mParentActivity)) {
@@ -2234,7 +2231,7 @@ public class CalendarView extends View
                         ev.startMillis, ev.endMillis, flags);
                 Log.i("Cal", "left: " + left + " right: " + right + " top: " + top
                         + " bottom: " + bottom + " ev: " + timeRange + " " + ev.title);
-            }
+            } */
             int upDistanceMin = 10000;     // any large number
             int downDistanceMin = 10000;   // any large number
             int leftDistanceMin = 10000;   // any large number
@@ -2600,20 +2597,25 @@ public class CalendarView extends View
         imageView = (ImageView) mPopupView.findViewById(R.id.repeat_icon);
         imageView.setVisibility(event.isRepeating ? View.VISIBLE : View.GONE);
 
-        int flags;
+        int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY
+            | DateUtils.FORMAT_ABBREV_ALL;
+
+        String tz;
         if (event.allDay) {
-            flags = DateUtils.FORMAT_UTC | DateUtils.FORMAT_SHOW_DATE |
-                    DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_ALL;
+            tz = Time.TIMEZONE_UTC;
         } else {
-            flags = DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE
-                    | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_ALL
-                    | DateUtils.FORMAT_CAP_NOON_MIDNIGHT;
+            tz = Utils.getTimeZone(mParentActivity, null);
+            flags |= DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_CAP_NOON_MIDNIGHT;
         }
+
         if (DateFormat.is24HourFormat(mParentActivity)) {
             flags |= DateUtils.FORMAT_24HOUR;
         }
-        String timeRange = Utils.formatDateRange(mParentActivity,
-                event.startMillis, event.endMillis, flags);
+
+        Formatter f = new Formatter(new StringBuilder(50), Locale.getDefault());
+        String timeRange = DateUtils.formatDateRange(mParentActivity, f, event.startMillis,
+                event.endMillis, flags, tz).toString();
+
         TextView timeView = (TextView) mPopupView.findViewById(R.id.time);
         timeView.setText(timeRange);
 

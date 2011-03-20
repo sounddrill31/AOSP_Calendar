@@ -31,7 +31,6 @@ import android.graphics.Paint.Style;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -54,6 +53,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Formatter;
+import java.util.Locale;
 
 public class MonthView extends View implements View.OnCreateContextMenuListener {
 
@@ -1082,30 +1083,32 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
 
             int flags;
             boolean showEndTime = false;
+            String tz;
             if (event.allDay) {
                 int numDays = event.endDay - event.startDay;
+                flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL;
+                tz = Time.TIMEZONE_UTC;
                 if (numDays == 0) {
-                    flags = DateUtils.FORMAT_UTC | DateUtils.FORMAT_SHOW_DATE
-                            | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_ALL;
+                    flags |= DateUtils.FORMAT_SHOW_WEEKDAY;
                 } else {
                     showEndTime = true;
-                    flags = DateUtils.FORMAT_UTC | DateUtils.FORMAT_SHOW_DATE
-                            | DateUtils.FORMAT_ABBREV_ALL;
                 }
             } else {
                 flags = DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_CAP_NOON_MIDNIGHT;
+                tz = Utils.getTimeZone(mParentActivity, null);
                 if (DateFormat.is24HourFormat(mParentActivity)) {
                     flags |= DateUtils.FORMAT_24HOUR;
                 }
             }
 
+            Formatter f = new Formatter(new StringBuilder(50), Locale.getDefault());
             String timeRange;
             if (showEndTime) {
-                timeRange = Utils.formatDateRange(mParentActivity,
-                        event.startMillis, event.endMillis, flags);
+                timeRange = DateUtils.formatDateRange(mParentActivity, f,
+                        event.startMillis, event.endMillis, flags, tz).toString();
             } else {
-                timeRange = Utils.formatDateRange(mParentActivity,
-                        event.startMillis, event.startMillis, flags);
+                timeRange = DateUtils.formatDateRange(mParentActivity, f,
+                        event.startMillis, event.startMillis, flags, tz).toString();
             }
 
             TextView timeView = null;

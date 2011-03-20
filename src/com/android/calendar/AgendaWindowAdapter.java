@@ -715,10 +715,10 @@ public class AgendaWindowAdapter extends BaseAdapter {
 
                 if (cursorSize != 0) {
                     // Remove the query that just completed
-                    QuerySpec x = mQueryQueue.poll();
+                    /* QuerySpec x = mQueryQueue.poll();
                     if (BASICLOG && !x.equals(data)) {
                         Log.e(TAG, "onQueryComplete - cookie != head of queue");
-                    }
+                    } */
                     mEmptyCursorCount = 0;
                     if (data.queryType == QUERY_TYPE_NEWER) {
                         mNewerRequestsProcessed++;
@@ -833,11 +833,11 @@ public class AgendaWindowAdapter extends BaseAdapter {
                         || data.end <= mAdapterInfos.getFirst().start) {
                     mAdapterInfos.addFirst(info);
                     listPositionOffset += info.size;
-                } else if (BASICLOG && data.start < mAdapterInfos.getLast().end) {
+                /* } else if (BASICLOG && data.start < mAdapterInfos.getLast().end) {
                     mAdapterInfos.addLast(info);
                     for (DayAdapterInfo info2 : mAdapterInfos) {
                         Log.e("========== BUG ==", info2.toString());
-                    }
+                    } */
                 } else {
                     mAdapterInfos.addLast(info);
                 }

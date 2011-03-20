@@ -43,7 +43,7 @@ import java.util.TimeZone;
  */
 public class TimezoneAdapter extends ArrayAdapter<TimezoneRow> {
     private static final String TAG = "TimezoneAdapter";
-    private static final boolean DEBUG = true;
+    // private static final boolean DEBUG = true;
 
     /**
      * {@link TimezoneRow} is an immutable class for representing a timezone. We

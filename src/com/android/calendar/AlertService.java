@@ -73,7 +73,7 @@ public class AlertService extends Service {
     private static final int ALERT_INDEX_TITLE = 3;
     private static final int ALERT_INDEX_EVENT_LOCATION = 4;
     private static final int ALERT_INDEX_SELF_ATTENDEE_STATUS = 5;
-    private static final int ALERT_INDEX_ALL_DAY = 6;
+    // private static final int ALERT_INDEX_ALL_DAY = 6;
     private static final int ALERT_INDEX_ALARM_TIME = 7;
     private static final int ALERT_INDEX_MINUTES = 8;
     private static final int ALERT_INDEX_BEGIN = 9;

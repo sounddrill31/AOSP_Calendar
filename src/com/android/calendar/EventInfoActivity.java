@@ -78,7 +78,9 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Formatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
@@ -131,7 +133,7 @@ public class EventInfoActivity extends Activity implements View.OnClickListener,
     private static final int EVENT_INDEX_COLOR = 12;
     private static final int EVENT_INDEX_HAS_ATTENDEE_DATA = 13;
     private static final int EVENT_INDEX_GUESTS_CAN_MODIFY = 14;
-    private static final int EVENT_INDEX_CAN_INVITE_OTHERS = 15;
+    // private static final int EVENT_INDEX_CAN_INVITE_OTHERS = 15;
     private static final int EVENT_INDEX_ORGANIZER = 16;
 
     private static final String[] ATTENDEES_PROJECTION = new String[] {
@@ -807,7 +809,6 @@ public class EventInfoActivity extends Activity implements View.OnClickListener,
                                     values).build());
 
             if (mHasAttendeeData) {
-                ContentProviderOperation.Builder b;
                 // Insert the new attendees
                 for (Attendee attendee : mAcceptedAttendees) {
                     addAttendee(values, ops, eventIdIndex, attendee,
@@ -919,23 +920,23 @@ public class EventInfoActivity extends Activity implements View.OnClickListener,
 
         // When
         String when;
-        int flags;
+        int flags = DateUtils.FORMAT_SHOW_DATE;
+        String localTimezone;
         if (allDay) {
-            flags = DateUtils.FORMAT_UTC | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_SHOW_DATE;
+            flags |= DateUtils.FORMAT_SHOW_WEEKDAY;
+            localTimezone = Time.TIMEZONE_UTC;
         } else {
-            flags = DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE;
+            flags |= DateUtils.FORMAT_SHOW_TIME;
+            localTimezone = Utils.getTimeZone(this, mUpdateTZ);
             if (DateFormat.is24HourFormat(this)) {
                 flags |= DateUtils.FORMAT_24HOUR;
             }
         }
-        when = Utils.formatDateRange(this, mStartMillis, mEndMillis, flags);
+
+        Formatter f = new Formatter(new StringBuilder(50), Locale.getDefault());
+        when = DateUtils.formatDateRange(this, f, mStartMillis, mEndMillis, flags, localTimezone).toString();
         setTextCommon(R.id.when, when);
 
-        // Show the event timezone if it is different from the local timezone
-        String localTimezone = Utils.getTimeZone(this, mUpdateTZ);
-        if (allDay) {
-            localTimezone = Time.TIMEZONE_UTC;
-        }
         if (eventTimezone != null && !allDay &&
                 (!TextUtils.equals(localTimezone, eventTimezone) ||
                 !TextUtils.equals(localTimezone, Time.getCurrentTimezone()))) {
