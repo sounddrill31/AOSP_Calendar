@@ -162,7 +162,7 @@ public class AlertActivity extends Activity {
         values.put(CalendarAlerts.BEGIN, begin);
         values.put(CalendarAlerts.END, end);
         values.put(CalendarAlerts.ALARM_TIME, alarmTime);
-        long currentTime = System.currentTimeMillis();
+        final long currentTime = System.currentTimeMillis();
         values.put(CalendarAlerts.CREATION_TIME, currentTime);
         values.put(CalendarAlerts.RECEIVED_TIME, 0);
         values.put(CalendarAlerts.NOTIFY_TIME, 0);

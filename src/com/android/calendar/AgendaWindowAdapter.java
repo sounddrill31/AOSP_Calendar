@@ -164,13 +164,9 @@ public class AgendaWindowAdapter extends BaseAdapter {
 
     private static class QuerySpec {
         long queryStartMillis;
-
         Time goToTime;
-
         int start;
-
         int end;
-
         int queryType;
 
         public QuerySpec(int queryType) {

@@ -245,16 +245,16 @@ public class DeleteEventHelper {
     }
 
     private void deleteRepeatingEvent(int which) {
-        int indexDtstart = mCursor.getColumnIndexOrThrow(Events.DTSTART);
-        int indexAllDay = mCursor.getColumnIndexOrThrow(Events.ALL_DAY);
-        int indexTitle = mCursor.getColumnIndexOrThrow(Events.TITLE);
-        int indexTimezone = mCursor.getColumnIndexOrThrow(Events.EVENT_TIMEZONE);
-        int indexCalendarId = mCursor.getColumnIndexOrThrow(Events.CALENDAR_ID);
+        final int indexDtstart = mCursor.getColumnIndexOrThrow(Events.DTSTART);
+        final int indexAllDay = mCursor.getColumnIndexOrThrow(Events.ALL_DAY);
+        final int indexTitle = mCursor.getColumnIndexOrThrow(Events.TITLE);
+        final int indexTimezone = mCursor.getColumnIndexOrThrow(Events.EVENT_TIMEZONE);
+        final int indexCalendarId = mCursor.getColumnIndexOrThrow(Events.CALENDAR_ID);
 
-        String rRule = mCursor.getString(mEventIndexRrule);
-        boolean allDay = mCursor.getInt(indexAllDay) != 0;
-        long dtstart = mCursor.getLong(indexDtstart);
-        long id = mCursor.getInt(mEventIndexId);
+        final String rRule = mCursor.getString(mEventIndexRrule);
+        final boolean allDay = mCursor.getInt(indexAllDay) != 0;
+        final long dtstart = mCursor.getLong(indexDtstart);
+        final long id = mCursor.getInt(mEventIndexId);
 
         // If the repeating event has not been given a sync id from the server
         // yet, then we can't delete a single instance of this event.  (This is

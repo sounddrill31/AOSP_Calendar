@@ -136,8 +136,8 @@ public class MonthActivity extends Activity implements ViewSwitcher.ViewFactory,
         // This is faster than calling getSelectedTime() because we avoid
         // a call to Time#normalize().
         if (animate) {
-            int currentMonth = currentTime.month + currentTime.year * 12;
-            int nextMonth = time.month + time.year * 12;
+            final int currentMonth = currentTime.month + currentTime.year * 12;
+            final int nextMonth = time.month + time.year * 12;
             if (nextMonth < currentMonth) {
                 mSwitcher.setInAnimation(mInAnimationPast);
                 mSwitcher.setOutAnimation(mOutAnimationPast);
@@ -257,7 +257,7 @@ public class MonthActivity extends Activity implements ViewSwitcher.ViewFactory,
 
         // Get first day of week based on locale and populate the day headers
         mStartDay = Calendar.getInstance().getFirstDayOfWeek();
-        int diff = mStartDay - Calendar.SUNDAY - 1;
+        final int diff = mStartDay - Calendar.SUNDAY - 1;
         final int startDay = Utils.getFirstDayOfWeek();
         final int sundayColor = getResources().getColor(R.color.sunday_text_color);
         final int saturdayColor = getResources().getColor(R.color.saturday_text_color);
@@ -296,7 +296,7 @@ public class MonthActivity extends Activity implements ViewSwitcher.ViewFactory,
 
     @Override
     protected void onNewIntent(Intent intent) {
-        long timeMillis = Utils.timeFromIntentInMillis(intent);
+        final long timeMillis = Utils.timeFromIntentInMillis(intent);
         if (timeMillis > 0) {
             Time time = new Time(Utils.getTimeZone(this, mUpdateTZ));
             time.set(timeMillis);

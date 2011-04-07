@@ -31,7 +31,6 @@ import android.graphics.Paint.Style;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -324,8 +323,8 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
             }
 
             public void setSelectedCell(MotionEvent e) {
-                int x = (int) e.getX();
-                int y = (int) e.getY();
+                final int x = (int) e.getX();
+                final int y = (int) e.getY();
                 int row = (y - WEEK_GAP) / (WEEK_GAP + mCellHeight);
                 int col = (x - mBorder) / (MONTH_DAY_GAP + mCellWidth);
                 if (row > 5) {
@@ -386,8 +385,8 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
                     mRedrawScreen = true;
                     invalidate();
                     mLaunchDayView = false;
-                    int x = (int) e.getX();
-                    int y = (int) e.getY();
+                    final int x = (int) e.getX();
+                    final int y = (int) e.getY();
                     long millis = getSelectedMillisFor(x, y);
                     Utils.startActivity(getContext(), mDetailedView, millis);
                 }
@@ -428,18 +427,18 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
                 case MenuHelper.MENU_DAY: {
-                    long startMillis = getSelectedTimeInMillis();
+                    final long startMillis = getSelectedTimeInMillis();
                     Utils.startActivity(mParentActivity, DayActivity.class.getName(), startMillis);
                     break;
                 }
                 case MenuHelper.MENU_AGENDA: {
-                    long startMillis = getSelectedTimeInMillis();
+                    final long startMillis = getSelectedTimeInMillis();
                     Utils.startActivity(mParentActivity, AgendaActivity.class.getName(), startMillis);
                     break;
                 }
                 case MenuHelper.MENU_EVENT_CREATE: {
-                    long startMillis = getSelectedTimeInMillis();
-                    long endMillis = startMillis + DateUtils.HOUR_IN_MILLIS;
+                    final long startMillis = getSelectedTimeInMillis();
+                    final long endMillis = startMillis + DateUtils.HOUR_IN_MILLIS;
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setClassName(mParentActivity, EditEvent.class.getName());
                     intent.putExtra(EVENT_BEGIN_TIME, startMillis);
@@ -475,7 +474,7 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
                 mRedrawScreen = true;
                 mParentActivity.stopProgressSpinner();
                 invalidate();
-                int numEvents = events.size();
+                final int numEvents = events.size();
 
                 // Clear out event days
                 for (int i = 0; i < EVENT_NUM_DAYS; i++) {
@@ -490,14 +489,12 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
                     if (startDay < 31 || endDay >= 0) {
                         if (startDay < 0) {
                             startDay = 0;
-                        }
-                        if (startDay > 31) {
+                        } else if (startDay > 31) {
                             startDay = 31;
                         }
                         if (endDay < 0) {
                             endDay = 0;
-                        }
-                        if (endDay > 31) {
+                        } else if (endDay > 31) {
                             endDay = 31;
                         }
                         for (int j = startDay; j < endDay; j++) {
@@ -679,7 +676,7 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
     }
 
     private long getSelectedMillisFor(int x, int y) {
-        int row = (y - WEEK_GAP) / (WEEK_GAP + mCellHeight);
+        final int row = (y - WEEK_GAP) / (WEEK_GAP + mCellHeight);
         int column = (x - mBorder) / (MONTH_DAY_GAP + mCellWidth);
         if (column > 6) {
             column = 6;
@@ -710,6 +707,7 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
         for(int i = 0; i < size; i++) {
             bitmapCache.valueAt(i).recycle();
         }
+        
         bitmapCache.clear();
 
     }
@@ -727,11 +725,11 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
         final int height = getMeasuredHeight();
 
         for (int row = 0; row < 6; row++) {
-            int y = WEEK_GAP + row * (WEEK_GAP + mCellHeight) - 1;
+            final int y = WEEK_GAP + row * (WEEK_GAP + mCellHeight) - 1;
             canvas.drawLine(0, y, width, y, p);
         }
         for (int column = 1; column < 7; column++) {
-            int x = mBorder + column * (MONTH_DAY_GAP + mCellWidth) - 1;
+            final int x = mBorder + column * (MONTH_DAY_GAP + mCellWidth) - 1;
             canvas.drawLine(x, WEEK_GAP, x, height, p);
         }
     }
@@ -883,19 +881,18 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
          *easy to find tags draw number draw day*/
         p.setTextAlign(Paint.Align.CENTER);
         // center of text
-        int textX = r.left + (r.right - BUSY_BITS_MARGIN - BUSY_BITS_WIDTH - r.left) / 2;
-        int textY = (int) (r.top + p.getTextSize() + TEXT_TOP_MARGIN); // bottom of text
+        final int textX = r.left + (r.right - BUSY_BITS_MARGIN - BUSY_BITS_WIDTH - r.left) / 2;
+        final int textY = (int) (r.top + p.getTextSize() + TEXT_TOP_MARGIN); // bottom of text
         canvas.drawText(String.valueOf(mCursor.getDayAt(row, column)), textX, textY, p);
     }
 
     ///Create and draw the event busybits for this day
     private void drawEvents(int date, Canvas canvas, Rect rect, Paint p, boolean drawBg) {
         // The top of the busybits section lines up with the top of the day number
-        int top = rect.top + TEXT_TOP_MARGIN + BUSY_BITS_MARGIN;
-        int left = rect.right - BUSY_BITS_MARGIN - BUSY_BITS_WIDTH;
+        final int top = rect.top + TEXT_TOP_MARGIN + BUSY_BITS_MARGIN;
+        final int left = rect.right - BUSY_BITS_MARGIN - BUSY_BITS_WIDTH;
 
         ArrayList<Event> events = mEvents;
-        int numEvents = events.size();
         EventGeometry geometry = mEventGeometry;
 
         if (drawBg) {
@@ -909,9 +906,8 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
             p.setStyle(Style.FILL);
             canvas.drawRect(rf, p);
         }
-
-        for (int i = 0; i < numEvents; i++) {
-            Event event = events.get(i);
+        
+        for(Event event : events) {
             if (!geometry.computeEventRect(date, left, top, BUSY_BITS_WIDTH, event)) {
                 continue;
             }
@@ -1059,16 +1055,13 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
 
         getHandler().removeCallbacks(mDismissPopup);
         ArrayList<Event> events = mEvents;
-        int numEvents = events.size();
-        if (numEvents == 0) {
+        if (events.size() == 0) {
             mPopup.dismiss();
             return;
         }
 
         int eventIndex = 0;
-        for (int i = 0; i < numEvents; i++) {
-            Event event = events.get(i);
-
+        for (Event event : events) {
             if (event.startDay > date || event.endDay < date) {
                 continue;
             }
@@ -1200,7 +1193,7 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
         if (eventIndex > 5) {
             eventIndex = 5;
         }
-        int popupHeight = 20 * eventIndex + 15;
+        final int popupHeight = 20 * eventIndex + 15;
         mPopup.setHeight(popupHeight);
 
         if (mPreviousPopupHeight != popupHeight) {
@@ -1217,20 +1210,19 @@ public class MonthView extends View implements View.OnCreateContextMenuListener 
 
         switch (keyCode) {
         case KeyEvent.KEYCODE_DPAD_CENTER:
-            if (mSelectionMode == SELECTION_HIDDEN) {
-                // Don't do anything unless the selection is visible.
-                break;
-            }
-
-            if (mSelectionMode == SELECTION_PRESSED) {
-                // This was the first press when there was nothing selected.
-                // Change the selection from the "pressed" state to the
-                // the "selected" state.  We treat short-press and
-                // long-press the same here because nothing was selected.
-                mSelectionMode = SELECTION_SELECTED;
-                mRedrawScreen = true;
-                invalidate();
-                break;
+            switch (mSelectionMode) {
+                case SELECTION_HIDDEN:
+                    // Don't do anything unless the selection is visible.
+                    break;
+                case SELECTION_PRESSED:
+                    // This was the first press when there was nothing selected.
+                    // Change the selection from the "pressed" state to the
+                    // the "selected" state.  We treat short-press and
+                    // long-press the same here because nothing was select
+                    mSelectionMode = SELECTION_SELECTED;
+                    mRedrawScreen = true;
+                    invalidate();
+                    break; 
             }
 
             // Check the duration to determine if this was a short press

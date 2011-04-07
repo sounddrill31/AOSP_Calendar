@@ -384,10 +384,9 @@ public class EventInfoActivity extends Activity implements View.OnClickListener,
         // Initialize the reminder values array.
         Resources r = getResources();
         String[] strings = r.getStringArray(R.array.reminder_minutes_values);
-        int size = strings.length;
-        ArrayList<Integer> list = new ArrayList<Integer>(size);
-        for (int i = 0 ; i < size ; i++) {
-            list.add(Integer.parseInt(strings[i]));
+        ArrayList<Integer> list = new ArrayList<Integer>(strings.length);
+        for(String str : strings) {
+            list.add(Integer.parseInt(str));
         }
         mReminderValues = list;
         String[] labels = r.getStringArray(R.array.reminder_minutes_labels);
@@ -592,8 +591,8 @@ public class EventInfoActivity extends Activity implements View.OnClickListener,
             cr.applyBatch(Calendars.CONTENT_URI.getAuthority(), ops);
             // Update the "hasAlarm" field for the event
             Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, mEventId);
-            int len = reminderMinutes.size();
-            boolean hasAlarm = len > 0;
+            final int len = reminderMinutes.size();
+            final boolean hasAlarm = len > 0;
             if (hasAlarm != mOriginalHasAlarm) {
                 ContentValues values = new ContentValues();
                 values.put(Events.HAS_ALARM, hasAlarm ? 1 : 0);
@@ -707,12 +706,12 @@ public class EventInfoActivity extends Activity implements View.OnClickListener,
             return false;
         }
         Spinner spinner = (Spinner) findViewById(R.id.response_value);
-        int position = spinner.getSelectedItemPosition() - mResponseOffset;
+        final int position = spinner.getSelectedItemPosition() - mResponseOffset;
         if (position <= 0) {
             return false;
         }
 
-        int status = ATTENDEE_VALUES[position];
+        final int status = ATTENDEE_VALUES[position];
 
         // If the status has not changed, then don't update the database
         if (status == mOriginalAttendeeResponse) {
@@ -782,11 +781,11 @@ public class EventInfoActivity extends Activity implements View.OnClickListener,
         try {
             ContentValues values = new ContentValues();
 
-            String title = cursor.getString(EVENT_INDEX_TITLE);
-            String timezone = cursor.getString(EVENT_INDEX_EVENT_TIMEZONE);
-            int calendarId = cursor.getInt(EVENT_INDEX_CALENDAR_ID);
-            boolean allDay = cursor.getInt(EVENT_INDEX_ALL_DAY) != 0;
-            String syncId = cursor.getString(EVENT_INDEX_SYNC_ID);
+            final String title = cursor.getString(EVENT_INDEX_TITLE);
+            final String timezone = cursor.getString(EVENT_INDEX_EVENT_TIMEZONE);
+            final int calendarId = cursor.getInt(EVENT_INDEX_CALENDAR_ID);
+            final boolean allDay = cursor.getInt(EVENT_INDEX_ALL_DAY) != 0;
+            final String syncId = cursor.getString(EVENT_INDEX_SYNC_ID);
 
             values.put(Events.TITLE, title);
             values.put(Events.EVENT_TIMEZONE, timezone);
@@ -801,13 +800,12 @@ public class EventInfoActivity extends Activity implements View.OnClickListener,
             values.put(Events.SELF_ATTENDEE_STATUS, status);
 
             ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-            int eventIdIndex = ops.size();
+            final int eventIdIndex = ops.size();
 
             ops.add(ContentProviderOperation.newInsert(Events.CONTENT_URI).withValues(
                                     values).build());
 
             if (mHasAttendeeData) {
-                ContentProviderOperation.Builder b;
                 // Insert the new attendees
                 for (Attendee attendee : mAcceptedAttendees) {
                     addAttendee(values, ops, eventIdIndex, attendee,

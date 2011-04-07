@@ -501,7 +501,7 @@ public class CalendarView extends View
         mDayStrs2Letter = new String[14];
 
         for (int i = Calendar.SUNDAY; i <= Calendar.SATURDAY; i++) {
-            int index = i - Calendar.SUNDAY;
+            final int index = i - Calendar.SUNDAY;
             // e.g. Tue for Tuesday
             mDayStrs[index] = DateUtils.getDayOfWeekString(i, DateUtils.LENGTH_MEDIUM);
             mDayStrs[index + 7] = mDayStrs[index];
@@ -655,7 +655,7 @@ public class CalendarView extends View
         // Set the base date to the beginning of the week if we are displaying
         // 7 days at a time.
         if (mNumDays == 7) {
-            int dayOfWeek = mBaseDate.weekDay;
+            final int dayOfWeek = mBaseDate.weekDay;
             int diff = dayOfWeek - mStartDay;
             if (diff != 0) {
                 if (diff < 0) {
@@ -721,20 +721,20 @@ public class CalendarView extends View
     protected void onSizeChanged(int width, int height, int oldw, int oldh) {
         mViewWidth = width;
         mViewHeight = height;
-        int gridAreaWidth = width - mHoursWidth;
+        final int gridAreaWidth = width - mHoursWidth;
         mCellWidth = (gridAreaWidth - (mNumDays * DAY_GAP)) / mNumDays;
 
         Paint p = new Paint();
         p.setTextSize(NORMAL_FONT_SIZE);
-        int bannerTextHeight = (int) Math.abs(p.ascent());
+        final int bannerTextHeight = (int) Math.abs(p.ascent());
 
         p.setTextSize(HOURS_FONT_SIZE);
         mHoursTextHeight = (int) Math.abs(p.ascent());
 
         p.setTextSize(EVENT_TEXT_FONT_SIZE);
-        float ascent = -p.ascent();
+        final float ascent = -p.ascent();
         mEventTextAscent = (int) Math.ceil(ascent);
-        float totalHeight = ascent + p.descent();
+        final float totalHeight = ascent + p.descent();
         mEventTextHeight = (int) Math.ceil(totalHeight);
 
         if (mNumDays > 1) {
@@ -763,9 +763,7 @@ public class CalendarView extends View
         // the earliest event in each day.
         int maxAllDayEvents = 0;
         ArrayList<Event> events = mEvents;
-        int len = events.size();
-        for (int ii = 0; ii < len; ii++) {
-            Event event = events.get(ii);
+        for (Event event : events) {
             if (event.startDay > mLastJulianDay || event.endDay < mFirstJulianDay)
                 continue;
             if (event.allDay) {
@@ -826,8 +824,8 @@ public class CalendarView extends View
 
         mGridAreaHeight = height - mFirstCell;
         mCellHeight = (mGridAreaHeight - ((mNumHours + 1) * HOUR_GAP)) / mNumHours;
-        int usedGridAreaHeight = (mCellHeight + HOUR_GAP) * mNumHours + HOUR_GAP;
-        int bottomSpace = mGridAreaHeight - usedGridAreaHeight;
+        final int usedGridAreaHeight = (mCellHeight + HOUR_GAP) * mNumHours + HOUR_GAP;
+        final int bottomSpace = mGridAreaHeight - usedGridAreaHeight;
         mEventGeometry.setHourHeight(mCellHeight);
 
         // Create an off-screen bitmap that we can draw into.
@@ -856,7 +854,7 @@ public class CalendarView extends View
         }
         mViewStartY = mFirstHour * (mCellHeight + HOUR_GAP) - mFirstHourOffset;
 
-        int eventAreaWidth = mNumDays * (mCellWidth + DAY_GAP);
+        final int eventAreaWidth = mNumDays * (mCellWidth + DAY_GAP);
         //When we get new events we don't want to dismiss the popup unless the event changes
         if (mSelectedEvent != null && mLastPopupEventID != mSelectedEvent.id) {
             mPopup.dismiss();
@@ -1287,7 +1285,7 @@ public class CalendarView extends View
         weekStart.hour = 0;
         weekStart.minute = 0;
         weekStart.second = 0;
-        long millis = weekStart.normalize(true /* ignore isDst */);
+        final long millis = weekStart.normalize(true /* ignore isDst */);
 
         // Avoid reloading events unnecessarily.
         if (millis == mLastReloadMillis) {
@@ -1359,8 +1357,8 @@ public class CalendarView extends View
     private void drawCalendarView(Canvas canvas) {
 
         // Copy the scrollable region from the big bitmap to the canvas.
-        Rect src = mSrcRect;
-        Rect dest = mDestRect;
+        final Rect src = mSrcRect;
+        final Rect dest = mDestRect;
 
         src.top = mViewStartY;
         src.bottom = mViewStartY + mGridAreaHeight;
@@ -1380,8 +1378,8 @@ public class CalendarView extends View
     }
 
     private void drawAfterScroll(Canvas canvas) {
-        Paint p = mPaint;
-        Rect r = mRect;
+        final Paint p = mPaint;
+        final Rect r = mRect;
 
         if (mMaxAllDayEvents != 0) {
             drawAllDayEvents(mFirstJulianDay, mNumDays, r, canvas, p);
@@ -1448,7 +1446,7 @@ public class CalendarView extends View
         p.setTextSize(NORMAL_FONT_SIZE);
         p.setTextAlign(Paint.Align.CENTER);
         int x = mHoursWidth;
-        int deltaX = mCellWidth + DAY_GAP;
+        final int deltaX = mCellWidth + DAY_GAP;
         int cell = mFirstJulianDay;
 
         String[] dayNames;
@@ -1477,7 +1475,7 @@ public class CalendarView extends View
             text = mPmString;
         }
         int y = mFirstCell + mFirstHourOffset + 2 * mHoursTextHeight + HOUR_GAP;
-        int right = mHoursWidth - HOURS_RIGHT_MARGIN;
+        final int right = mHoursWidth - HOURS_RIGHT_MARGIN;
         canvas.drawText(text, right, y, p);
 
         if (mFirstHour < 12 && mFirstHour + mNumHours > 12) {
@@ -1516,8 +1514,8 @@ public class CalendarView extends View
     }
 
     private void doDraw(Canvas canvas) {
-        Paint p = mPaint;
-        Rect r = mRect;
+        final Paint p = mPaint;
+        final Rect r = mRect;
         int lineY = mCurrentTime.hour*(mCellHeight + HOUR_GAP)
             + ((mCurrentTime.minute * mCellHeight) / 60)
             + 1;
@@ -1527,7 +1525,7 @@ public class CalendarView extends View
 
         // Draw each day
         int x = mHoursWidth;
-        int deltaX = mCellWidth + DAY_GAP;
+        final int deltaX = mCellWidth + DAY_GAP;
         int cell = mFirstJulianDay;
         for (int day = 0; day < mNumDays; day++, cell++) {
             drawEvents(cell, x, HOUR_GAP, canvas, p);
@@ -1576,7 +1574,7 @@ public class CalendarView extends View
 
             // Also draw the highlight on the grid
             p.setColor(mCalendarGridAreaSelected);
-            int daynum = mSelectionDay - mFirstJulianDay;
+            final int daynum = mSelectionDay - mFirstJulianDay;
             r.left = mHoursWidth + daynum * (mCellWidth + DAY_GAP);
             r.right = r.left + mCellWidth;
             canvas.drawRect(r, p);
@@ -1617,7 +1615,7 @@ public class CalendarView extends View
         // if the title text has changed => announce period
         CharSequence titleTextViewText = mTitleTextView.getText();
         // intended use of identity comparison
-        boolean titleChanged = titleTextViewText != mPrevTitleTextViewText;
+        final boolean titleChanged = titleTextViewText != mPrevTitleTextViewText;
         if (titleChanged) {
             mPrevTitleTextViewText = titleTextViewText;
             sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
@@ -1860,9 +1858,8 @@ public class CalendarView extends View
     private int computeMaxStringWidth(int currentMax, String[] strings, Paint p) {
         float maxWidthF = 0.0f;
 
-        int len = strings.length;
-        for (int i = 0; i < len; i++) {
-            float width = p.measureText(strings[i]);
+        for (String str : strings) {
+            final float width = p.measureText(str);
             maxWidthF = Math.max(width, maxWidthF);
         }
         int maxWidth = (int) (maxWidthF + 0.5);
@@ -1929,11 +1926,9 @@ public class CalendarView extends View
         float left = mHoursWidth;
         int lastDay = firstDay + numDays - 1;
         ArrayList<Event> events = mEvents;
-        int numEvents = events.size();
         float drawHeight = mAllDayHeight;
         float numRectangles = mMaxAllDayEvents;
-        for (int i = 0; i < numEvents; i++) {
-            Event event = events.get(i);
+        for (Event event : events) {
             if (!event.allDay)
                 continue;
             int startDay = event.startDay;
@@ -2011,8 +2006,7 @@ public class CalendarView extends View
         }
 
         // First, clear all the links
-        for (int ii = 0; ii < len; ii++) {
-            Event ev = mSelectedEvents.get(ii);
+        for (Event ev : mSelectedEvents) {
             ev.nextUp = null;
             ev.nextDown = null;
             ev.nextLeft = null;
@@ -2100,11 +2094,9 @@ public class CalendarView extends View
         selectionArea.right = selectionArea.left + cellWidth;
 
         ArrayList<Event> events = mEvents;
-        int numEvents = events.size();
         EventGeometry geometry = mEventGeometry;
 
-        for (int i = 0; i < numEvents; i++) {
-            Event event = events.get(i);
+        for (Event event : events) {
             if (!geometry.computeEventRect(date, left, top, cellWidth, event)) {
                 continue;
             }
@@ -2137,8 +2129,7 @@ public class CalendarView extends View
         }
 
         // First, clear all the links
-        for (int ii = 0; ii < len; ii++) {
-            Event ev = mSelectedEvents.get(ii);
+        for (Event ev : mSelectedEvents) {
             ev.nextUp = null;
             ev.nextDown = null;
             ev.nextLeft = null;
@@ -2423,11 +2414,11 @@ public class CalendarView extends View
         // Fade visible boxes if event was declined.
         boolean declined = (event.selfAttendeeStatus == Attendees.ATTENDEE_STATUS_DECLINED);
         if (declined) {
-            int alpha = color & 0xff000000;
+            final int alpha = color & 0xff000000;
             color &= 0x00ffffff;
-            int red = (color & 0x00ff0000) >> 16;
-            int green = (color & 0x0000ff00) >> 8;
-            int blue = (color & 0x0000ff);
+            final int red = (color & 0x00ff0000) >> 16;
+            final int green = (color & 0x0000ff00) >> 8;
+            final int blue = (color & 0x0000ff);
             color = ((red >> 1) << 16) | ((green >> 1) << 8) | (blue >> 1);
             color += 0x7F7F7F + alpha;
         }
@@ -2490,11 +2481,11 @@ public class CalendarView extends View
             return;
         }
 
-        float width = rf.right - rf.left;
+        final float width = rf.right - rf.left;
         float height = rf.bottom - rf.top;
 
         // Leave one pixel extra space between lines
-        int lineHeight = mEventTextHeight + 1;
+        final int lineHeight = mEventTextHeight + 1;
 
         // If the rectangle is too small for text, then return
         if (width < MIN_CELL_WIDTH_FOR_TEXT || height <= lineHeight) {
@@ -2691,8 +2682,8 @@ public class CalendarView extends View
         // Use the distance from the current point to the initial touch instead
         // of deltaX and deltaY to avoid accumulating floating-point rounding
         // errors.  Also, we don't need floats, we can use ints.
-        int distanceX = (int) e1.getX() - (int) e2.getX();
-        int distanceY = (int) e1.getY() - (int) e2.getY();
+        final int distanceX = (int) e1.getX() - (int) e2.getX();
+        final int distanceY = (int) e1.getY() - (int) e2.getY();
 
         // If we haven't figured out the predominant scroll direction yet,
         // then do it now.
@@ -2772,10 +2763,10 @@ public class CalendarView extends View
         mTouchMode = TOUCH_MODE_INITIAL_STATE;
         mSelectionMode = SELECTION_HIDDEN;
         mOnFlingCalled = true;
-        int deltaX = (int) e2.getX() - (int) e1.getX();
-        int distanceX = Math.abs(deltaX);
-        int deltaY = (int) e2.getY() - (int) e1.getY();
-        int distanceY = Math.abs(deltaY);
+        final int deltaX = (int) e2.getX() - (int) e1.getX();
+        final int distanceX = Math.abs(deltaX);
+        final int deltaY = (int) e2.getY() - (int) e1.getY();
+        final int distanceY = Math.abs(deltaY);
 
         if ((distanceX >= HORIZONTAL_SCROLL_THRESHOLD) && (distanceX > distanceY)) {
             boolean switchForward = initNextView(deltaX);

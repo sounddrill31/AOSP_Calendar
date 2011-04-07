@@ -48,7 +48,7 @@ public class LaunchActivity extends Activity {
 
         // Only try looking for an account if this is the first launch.
         if (icicle == null) {
-            Account[] accounts = AccountManager.get(this).getAccounts();
+            final Account[] accounts = AccountManager.get(this).getAccounts();
             if(accounts.length > 0) {
                 // If the only account is an account that can't use Calendar we let the user into
                 // Calendar, but they can't create any events until they add an account with a
@@ -70,7 +70,7 @@ public class LaunchActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Account[] accounts = AccountManager.get(this).getAccounts();
+        final Account[] accounts = AccountManager.get(this).getAccounts();
         if(accounts.length > 0) {
             // If the only account is an account that can't use Calendar we let the user into
             // Calendar, but they can't create any events until they add an account with a

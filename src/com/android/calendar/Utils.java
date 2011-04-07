@@ -58,7 +58,7 @@ public class Utils {
     private static final TimeZoneUtils mTZUtils = new TimeZoneUtils(SHARED_PREFS_NAME);
 
     public static void startActivity(Context context, String className, long time) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
+        final Intent intent = new Intent(Intent.ACTION_VIEW);
 
         intent.setClassName(context, className);
         intent.putExtra(EVENT_BEGIN_TIME, time);
@@ -68,7 +68,7 @@ public class Utils {
     }
 
     static String getSharedPreference(Context context, String key, String defaultValue) {
-        SharedPreferences prefs = CalendarPreferenceActivity.getSharedPreferences(context);
+        final SharedPreferences prefs = CalendarPreferenceActivity.getSharedPreferences(context);
         return prefs.getString(key, defaultValue);
     }
 
@@ -120,17 +120,17 @@ public class Utils {
     }
 
     static void setSharedPreference(Context context, String key, String value) {
-        SharedPreferences prefs = CalendarPreferenceActivity.getSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
+        final SharedPreferences prefs = CalendarPreferenceActivity.getSharedPreferences(context);
+        final SharedPreferences.Editor editor = prefs.edit();
         editor.putString(key, value);
         editor.apply();
     }
 
     static void setDefaultView(Context context, int viewId) {
-        String activityString = CalendarApplication.ACTIVITY_NAMES[viewId];
+        final String activityString = CalendarApplication.ACTIVITY_NAMES[viewId];
 
-        SharedPreferences prefs = CalendarPreferenceActivity.getSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
+        final SharedPreferences prefs = CalendarPreferenceActivity.getSharedPreferences(context);
+        final SharedPreferences.Editor editor = prefs.edit();
         if (viewId == CalendarApplication.AGENDA_VIEW_ID ||
                 viewId == CalendarApplication.DAY_VIEW_ID) {
             // Record the (new) detail start view only for Agenda and Day
@@ -143,15 +143,15 @@ public class Utils {
     }
 
     public static final Time timeFromIntent(Intent intent) {
-        Time time = new Time();
+        final Time time = new Time();
         time.set(timeFromIntentInMillis(intent));
         return time;
     }
 
     public static MatrixCursor matrixCursorFromCursor(Cursor cursor) {
-        MatrixCursor newCursor = new MatrixCursor(cursor.getColumnNames());
-        int numColumns = cursor.getColumnCount();
-        String data[] = new String[numColumns];
+        final MatrixCursor newCursor = new MatrixCursor(cursor.getColumnNames());
+        final int numColumns = cursor.getColumnCount();
+        final String data[] = new String[numColumns];
         cursor.moveToPosition(-1);
         while (cursor.moveToNext()) {
             for (int i = 0; i < numColumns; i++) {
@@ -173,7 +173,7 @@ public class Utils {
             return false;
         }
 
-        int numColumns = c1.getColumnCount();
+        final int numColumns = c1.getColumnCount();
         if (numColumns != c2.getColumnCount()) {
             return false;
         }
@@ -201,14 +201,14 @@ public class Utils {
      */
     public static final long timeFromIntentInMillis(Intent intent) {
         // If the time was specified, then use that.  Otherwise, use the current time.
-        Uri data = intent.getData();
+        final Uri data = intent.getData();
         long millis = intent.getLongExtra(EVENT_BEGIN_TIME, -1);
         if (millis == -1 && data != null && data.isHierarchical()) {
-            List<String> path = data.getPathSegments();
+            final List<String> path = data.getPathSegments();
             if(path.size() == 2 && path.get(0).equals("time")) {
                 try {
                     millis = Long.valueOf(data.getLastPathSegment());
-                } catch (NumberFormatException e) {
+                } catch (final NumberFormatException e) {
                     Log.i("Calendar", "timeFromIntentInMillis: Data existed but no valid time " +
                             "found. Using current time.");
                 }
@@ -221,12 +221,12 @@ public class Utils {
     }
 
     public static final void applyAlphaAnimation(ViewFlipper v) {
-        AlphaAnimation in = new AlphaAnimation(0.0f, 1.0f);
+        final AlphaAnimation in = new AlphaAnimation(0.0f, 1.0f);
 
         in.setStartOffset(0);
         in.setDuration(500);
 
-        AlphaAnimation out = new AlphaAnimation(1.0f, 0.0f);
+        final AlphaAnimation out = new AlphaAnimation(1.0f, 0.0f);
 
         out.setStartOffset(0);
         out.setDuration(500);
@@ -247,11 +247,11 @@ public class Utils {
          * be even darker.
          */
         color &= CLEAR_ALPHA_MASK;
-        int startColor = color | HIGH_ALPHA;
-        int middleColor = color | MED_ALPHA;
-        int endColor = color | LOW_ALPHA;
-        int[] colors = new int[] {startColor, middleColor, endColor};
-        GradientDrawable d = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
+        final int startColor = color | HIGH_ALPHA;
+        final int middleColor = color | MED_ALPHA;
+        final int endColor = color | LOW_ALPHA;
+        final int[] colors = new int[] {startColor, middleColor, endColor};
+        final GradientDrawable d = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
         d.setCornerRadii(CORNERS);
         return d;
     }
@@ -288,9 +288,9 @@ public class Utils {
      * @return a string contained the things joined together
      */
     public static String join(List<?> things, String delim) {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         boolean first = true;
-        for (Object thing : things) {
+        for (final Object thing : things) {
             if (first) {
                 first = false;
             } else {
@@ -316,13 +316,11 @@ public class Utils {
      * @return the first day of week in android.text.format.Time
      */
     public static int getFirstDayOfWeek() {
-        int startDay = Calendar.getInstance().getFirstDayOfWeek();
-        if (startDay == Calendar.SATURDAY) {
-            return Time.SATURDAY;
-        } else if (startDay == Calendar.MONDAY) {
-            return Time.MONDAY;
-        } else {
-            return Time.SUNDAY;
+        final int startDay = Calendar.getInstance().getFirstDayOfWeek();
+        switch(startDay) {
+            case Calendar.SATURDAY: return Time.SATURDAY;
+            case Calendar.MONDAY: return Time.MONDAY;
+            default: return Time.SUNDAY;
         }
     }
 
@@ -364,7 +362,7 @@ public class Utils {
         isDuplicateName.clear();
         cursor.moveToPosition(-1);
         while (cursor.moveToNext()) {
-            String displayName = cursor.getString(nameIndex);
+            final String displayName = cursor.getString(nameIndex);
             // Set it to true if we've seen this name before, false otherwise
             if (displayName != null) {
                 isDuplicateName.put(displayName, isDuplicateName.containsKey(displayName));

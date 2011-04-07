@@ -231,8 +231,8 @@ public class SelectCalendarsAdapter extends CursorTreeAdapter implements View.On
         }
         //Collect proper description for account types
         mAuthDescs = AccountManager.get(context).getAuthenticatorTypes();
-        for (int i = 0; i < mAuthDescs.length; i++) {
-            mTypeToAuthDescription.put(mAuthDescs[i].type, mAuthDescs[i]);
+        for (AuthenticatorDescription mAuthDesc : mAuthDescs) {
+            mTypeToAuthDescription.put(mAuthDesc.type, mAuthDesc);
         }
         mView = mActivity.getExpandableListView();
         mRefresh = true;

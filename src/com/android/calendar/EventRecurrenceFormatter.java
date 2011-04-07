@@ -38,7 +38,7 @@ public class EventRecurrenceFormatter
 
                     // Do one less iteration in the loop so the last element is added out of the
                     // loop. This is done so the comma is not placed after the last item.
-                    int count = recurrence.bydayCount - 1;
+                    final int count = recurrence.bydayCount - 1;
                     if (count >= 0) {
                         for (int i = 0 ; i < count ; i++) {
                             days.append(dayToString(recurrence.byday[i]));
@@ -57,7 +57,7 @@ public class EventRecurrenceFormatter
                         return null;
                     }
 
-                    int day = EventRecurrence.timeDay2Day(recurrence.startDate.weekDay);
+                    final int day = EventRecurrence.timeDay2Day(recurrence.startDate.weekDay);
                     return String.format(format, dayToString(day));
                 }
             }

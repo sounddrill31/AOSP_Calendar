@@ -76,9 +76,9 @@ public class AgendaAdapter extends ResourceCursorAdapter {
             holder.overLayColor = 0;
         }
 
-        TextView title = holder.title;
-        TextView when = holder.when;
-        TextView where = holder.where;
+        final TextView title = holder.title;
+        final TextView when = holder.when;
+        final TextView where = holder.where;
 
         /* Calendar Color */
         int color = cursor.getInt(AgendaWindowAdapter.INDEX_COLOR);

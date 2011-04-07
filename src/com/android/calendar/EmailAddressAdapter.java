@@ -69,8 +69,8 @@ public class EmailAddressAdapter extends ResourceCursorAdapter {
 
     @Override
     public Cursor runQueryOnBackgroundThread(CharSequence constraint) {
-        String filter = constraint == null ? "" : constraint.toString();
-        Uri uri = Uri.withAppendedPath(Email.CONTENT_FILTER_URI, Uri.encode(filter));
+        final String filter = constraint == null ? "" : constraint.toString();
+        final Uri uri = Uri.withAppendedPath(Email.CONTENT_FILTER_URI, Uri.encode(filter));
         return mContentResolver.query(uri, PROJECTION, null, null, SORT_ORDER);
     }
 }

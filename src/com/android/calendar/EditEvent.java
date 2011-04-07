@@ -365,9 +365,9 @@ public class EditEvent extends Activity implements View.OnClickListener,
             long endMillis;
             if (mView == mStartDateButton) {
                 // The start date was changed.
-                int yearDuration = endTime.year - startTime.year;
-                int monthDuration = endTime.month - startTime.month;
-                int monthDayDuration = endTime.monthDay - startTime.monthDay;
+                final int yearDuration = endTime.year - startTime.year;
+                final int monthDuration = endTime.month - startTime.month;
+                final int monthDayDuration = endTime.monthDay - startTime.monthDay;
 
                 startTime.year = year;
                 startTime.month = month;
@@ -460,8 +460,8 @@ public class EditEvent extends Activity implements View.OnClickListener,
         }
 
         if (v == mDeleteButton) {
-            long begin = mStartTime.toMillis(false /* use isDst */);
-            long end = mEndTime.toMillis(false /* use isDst */);
+            final long begin = mStartTime.toMillis(false /* use isDst */);
+            final long end = mEndTime.toMillis(false /* use isDst */);
             int which = -1;
             switch (mModification) {
             case MODIFY_SELECTED:
@@ -563,7 +563,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
                     return;
                 }
 
-                int defaultCalendarPosition = findDefaultCalendarPosition(mCalendarsCursor);
+                final int defaultCalendarPosition = findDefaultCalendarPosition(mCalendarsCursor);
 
                 // populate the calendars spinner
                 CalendarsAdapter adapter = new CalendarsAdapter(EditEvent.this, mCalendarsCursor);
@@ -674,7 +674,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
             long calendarId = mEventCursor.getInt(EVENT_INDEX_CALENDAR_ID);
             mOwnerAccount = mEventCursor.getString(EVENT_INDEX_OWNER_ACCOUNT);
             if (!TextUtils.isEmpty(mOwnerAccount)) {
-                String ownerDomain = extractDomain(mOwnerAccount);
+                final String ownerDomain = extractDomain(mOwnerAccount);
                 if (ownerDomain != null) {
                     domain = ownerDomain;
                 }
@@ -824,17 +824,16 @@ public class EditEvent extends Activity implements View.OnClickListener,
         // Initialize the reminder values array.
         Resources r = getResources();
         String[] strings = r.getStringArray(R.array.reminder_minutes_values);
-        int size = strings.length;
-        ArrayList<Integer> list = new ArrayList<Integer>(size);
-        for (int i = 0 ; i < size ; i++) {
-            list.add(Integer.parseInt(strings[i]));
+        ArrayList<Integer> list = new ArrayList<Integer>(strings.length);
+        for(String str : strings) {
+            list.add(Integer.parseInt(str));
         }
         mReminderValues = list;
-        String[] labels = r.getStringArray(R.array.reminder_minutes_labels);
+        final String[] labels = r.getStringArray(R.array.reminder_minutes_labels);
         mReminderLabels = new ArrayList<String>(Arrays.asList(labels));
 
         SharedPreferences prefs = CalendarPreferenceActivity.getSharedPreferences(this);
-        String durationString =
+        final String durationString =
                 prefs.getString(CalendarPreferenceActivity.KEY_DEFAULT_REMINDER, "0");
         mDefaultReminderMinutes = Integer.parseInt(durationString);
 
@@ -851,20 +850,20 @@ public class EditEvent extends Activity implements View.OnClickListener,
                 && (mEventCursor.getInt(EVENT_INDEX_HAS_ALARM) != 0);
         if (hasAlarm) {
             Uri uri = Reminders.CONTENT_URI;
-            String where = String.format(REMINDERS_WHERE, eventId);
+            final String where = String.format(REMINDERS_WHERE, eventId);
             Cursor reminderCursor = cr.query(uri, REMINDERS_PROJECTION, where, null, null);
             try {
                 // First pass: collect all the custom reminder minutes (e.g.,
                 // a reminder of 8 minutes) into a global list.
                 while (reminderCursor.moveToNext()) {
-                    int minutes = reminderCursor.getInt(REMINDERS_INDEX_MINUTES);
+                    final int minutes = reminderCursor.getInt(REMINDERS_INDEX_MINUTES);
                     EditEvent.addMinutesToList(this, mReminderValues, mReminderLabels, minutes);
                 }
 
                 // Second pass: create the reminder spinners
                 reminderCursor.moveToPosition(-1);
                 while (reminderCursor.moveToNext()) {
-                    int minutes = reminderCursor.getInt(REMINDERS_INDEX_MINUTES);
+                    final int minutes = reminderCursor.getInt(REMINDERS_INDEX_MINUTES);
                     mOriginalMinutes.add(minutes);
                     EditEvent.addReminder(this, this, mReminderItems, mReminderValues,
                             mReminderLabels, minutes);
@@ -888,15 +887,15 @@ public class EditEvent extends Activity implements View.OnClickListener,
 
        // Attendees cursor
         if (mHasAttendeeData && eventId != -1) {
-            Uri uri = Attendees.CONTENT_URI;
-            String[] whereArgs = {Long.toString(eventId)};
+            final Uri uri = Attendees.CONTENT_URI;
+            final String[] whereArgs = {Long.toString(eventId)};
             Cursor attendeeCursor = cr.query(uri, ATTENDEES_PROJECTION, ATTENDEES_WHERE, whereArgs,
                     null);
             try {
                 StringBuilder b = new StringBuilder();
                 while (attendeeCursor.moveToNext()) {
-                    String name = attendeeCursor.getString(ATTENDEES_INDEX_NAME);
-                    String email = attendeeCursor.getString(ATTENDEES_INDEX_EMAIL);
+                    final String name = attendeeCursor.getString(ATTENDEES_INDEX_NAME);
+                    final String email = attendeeCursor.getString(ATTENDEES_INDEX_EMAIL);
                     if (email != null) {
                         if (name != null && name.length() > 0 && !name.equals(email)) {
                             b.append('"').append(name).append("\" ");
@@ -960,32 +959,32 @@ public class EditEvent extends Activity implements View.OnClickListener,
     private static InputFilter[] sRecipientFilters = new InputFilter[] { new Rfc822InputFilter() };
 
     private void initFromIntent(Intent intent) {
-        String title = intent.getStringExtra(Events.TITLE);
+        final String title = intent.getStringExtra(Events.TITLE);
         if (title != null) {
             mTitleTextView.setText(title);
         }
 
-        String location = intent.getStringExtra(Events.EVENT_LOCATION);
+        final String location = intent.getStringExtra(Events.EVENT_LOCATION);
         if (location != null) {
             mLocationTextView.setText(location);
         }
 
-        String description = intent.getStringExtra(Events.DESCRIPTION);
+        final String description = intent.getStringExtra(Events.DESCRIPTION);
         if (description != null) {
             mDescriptionTextView.setText(description);
         }
 
-        int availability = intent.getIntExtra(Events.TRANSPARENCY, -1);
+        final int availability = intent.getIntExtra(Events.TRANSPARENCY, -1);
         if (availability != -1) {
             mAvailabilitySpinner.setSelection(availability);
         }
 
-        int visibility = intent.getIntExtra(Events.VISIBILITY, -1);
+        final int visibility = intent.getIntExtra(Events.VISIBILITY, -1);
         if (visibility != -1) {
             mVisibilitySpinner.setSelection(visibility);
         }
 
-        String rrule = intent.getStringExtra(Events.RRULE);
+        final String rrule = intent.getStringExtra(Events.RRULE);
         if (!TextUtils.isEmpty(rrule)) {
             mRrule = rrule;
             mEventRecurrence.parse(rrule);
@@ -1009,9 +1008,9 @@ public class EditEvent extends Activity implements View.OnClickListener,
             cursor.moveToFirst();
 
             mRrule = cursor.getString(EVENT_INDEX_RRULE);
-            String title = cursor.getString(EVENT_INDEX_TITLE);
-            String description = cursor.getString(EVENT_INDEX_DESCRIPTION);
-            String location = cursor.getString(EVENT_INDEX_EVENT_LOCATION);
+            final String title = cursor.getString(EVENT_INDEX_TITLE);
+            final String description = cursor.getString(EVENT_INDEX_DESCRIPTION);
+            final String location = cursor.getString(EVENT_INDEX_EVENT_LOCATION);
             int availability = cursor.getInt(EVENT_INDEX_TRANSPARENCY);
             int visibility = cursor.getInt(EVENT_INDEX_VISIBILITY);
             if (visibility > 0) {
@@ -1063,14 +1062,18 @@ public class EditEvent extends Activity implements View.OnClickListener,
                         .setTitle(R.string.edit_event_label)
                         .setItems(items, new OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                if (which == 0) {
+                                switch(which) {
+                                case 0:
                                     mModification =
-                                            (mSyncId == null) ? MODIFY_ALL : MODIFY_SELECTED;
-                                } else if (which == 1) {
+                                        (mSyncId == null) ? MODIFY_ALL : MODIFY_SELECTED;
+                                    break;
+                                case 1:
                                     mModification =
                                         (mSyncId == null) ? MODIFY_ALL_FOLLOWING : MODIFY_ALL;
-                                } else if (which == 2) {
+                                    break;
+                                case 2:
                                     mModification = MODIFY_ALL_FOLLOWING;
+                                    break;
                                 }
 
                                 // If we are modifying all the events in a
@@ -1103,7 +1106,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
 
                 // Round the time to the nearest half hour.
                 mStartTime.second = 0;
-                int minute = mStartTime.minute;
+                final int minute = mStartTime.minute;
                 if (minute == 0) {
                     // We are already on a half hour increment
                 } else if (minute > 0 && minute <= 30) {
@@ -1113,7 +1116,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
                     mStartTime.hour += 1;
                 }
 
-                long startMillis = mStartTime.normalize(true /* ignore isDst */);
+                final long startMillis = mStartTime.normalize(true /* ignore isDst */);
                 mEndTime.set(startMillis + DateUtils.HOUR_IN_MILLIS);
             }
 
@@ -1243,15 +1246,15 @@ public class EditEvent extends Activity implements View.OnClickListener,
      * formats and displays them.
      */
     private void updateHomeTime() {
-        String tz = Utils.getTimeZone(this, mUpdateTZ);
+        final String tz = Utils.getTimeZone(this, mUpdateTZ);
         if (!mAllDayCheckBox.isChecked() && !TextUtils.equals(tz, mTimezone)) {
             int flags = DateUtils.FORMAT_SHOW_TIME;
             boolean is24Format = DateFormat.is24HourFormat(this);
             if (is24Format) {
                 flags |= DateUtils.FORMAT_24HOUR;
             }
-            long millisStart = mStartTime.toMillis(false);
-            long millisEnd = mEndTime.toMillis(false);
+            final long millisStart = mStartTime.toMillis(false);
+            final long millisEnd = mEndTime.toMillis(false);
 
             boolean isDSTStart = mStartTime.isDst != 0;
             boolean isDSTEnd = mEndTime.isDst != 0;
@@ -1357,8 +1360,8 @@ public class EditEvent extends Activity implements View.OnClickListener,
 
     private void populateRepeats() {
         Time time = mStartTime;
-        Resources r = getResources();
-        int resource = android.R.layout.simple_spinner_item;
+        final Resources r = getResources();
+        final int resource = android.R.layout.simple_spinner_item;
 
         String[] days = new String[] {
             DateUtils.getDayOfWeekString(Calendar.SUNDAY, DateUtils.LENGTH_MEDIUM),
@@ -1396,7 +1399,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
         recurrenceIndexes.add(REPEATS_WEEKLY_ON_DAY);
 
         // Calculate whether this is the 1st, 2nd, 3rd, 4th, or last appearance of the given day.
-        int dayNumber = (time.monthDay - 1) / 7;
+        final int dayNumber = (time.monthDay - 1) / 7;
         format = r.getString(R.string.monthly_on_day_count);
         repeatArray.add(String.format(format, ordinals[dayNumber], days[time.weekDay]));
         recurrenceIndexes.add(REPEATS_MONTHLY_ON_DAY_COUNT);
@@ -1405,7 +1408,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
         repeatArray.add(String.format(format, time.monthDay));
         recurrenceIndexes.add(REPEATS_MONTHLY_ON_DAY);
 
-        long when = time.toMillis(false);
+        final long when = time.toMillis(false);
         format = r.getString(R.string.yearly);
         int flags = 0;
         if (DateFormat.is24HourFormat(this)) {
@@ -1483,7 +1486,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
         reminderRemoveButton = (ImageButton) reminderItem.findViewById(R.id.reminder_remove);
         reminderRemoveButton.setOnClickListener(listener);
 
-        int index = findMinutesInReminderList(values, minutes);
+        final int index = findMinutesInReminderList(values, minutes);
         spinner.setSelection(index);
         items.add(reminderItem);
 
@@ -1492,7 +1495,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
 
     static void addMinutesToList(Context context, ArrayList<Integer> values,
             ArrayList<String> labels, int minutes) {
-        int index = values.indexOf(minutes);
+        final int index = values.indexOf(minutes);
         if (index != -1) {
             return;
         }
@@ -1501,7 +1504,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
         // into the list.
 
         String label = constructReminderLabel(context, minutes, false);
-        int len = values.size();
+        final int len = values.size();
         for (int i = 0; i < len; i++) {
             if (minutes < values.get(i)) {
                 values.add(i, minutes);
@@ -1522,7 +1525,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
      * @return the index of "minutes" in the "values" list
      */
     private static int findMinutesInReminderList(ArrayList<Integer> values, int minutes) {
-        int index = values.indexOf(minutes);
+        final int index = values.indexOf(minutes);
         if (index == -1) {
             // This should never happen.
             Log.e("Cal", "Cannot find minutes (" + minutes + ") in list");
@@ -1569,7 +1572,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
     }
 
     private void setDate(TextView view, long millis) {
-        int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR |
+        final int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR |
                 DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_MONTH |
                 DateUtils.FORMAT_ABBREV_WEEKDAY;
 
@@ -1652,7 +1655,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
         // Update the "hasAlarm" field for the event
         ArrayList<Integer> reminderMinutes = reminderItemsToMinutes(mReminderItems,
                 mReminderValues);
-        int len = reminderMinutes.size();
+        final int len = reminderMinutes.size();
         values.put(Events.HAS_ALARM, (len > 0) ? 1 : 0);
 
         // For recurring events, we must make sure that we use duration rather
@@ -1760,7 +1763,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
         }
 
         // New Event or New Exception to an existing event
-        boolean newEvent = (eventIdIndex != -1);
+        final boolean newEvent = (eventIdIndex != -1);
 
         if (newEvent) {
             saveRemindersWithBackRef(ops, eventIdIndex, reminderMinutes, mOriginalMinutes,
@@ -1826,7 +1829,7 @@ public class EditEvent extends Activity implements View.OnClickListener,
 
                 // the eventId is only used if eventIdIndex is -1.
                 // TODO: clean up this code.
-                long eventId = uri != null ? ContentUris.parseId(uri) : -1;
+                final long eventId = uri != null ? ContentUris.parseId(uri) : -1;
 
                 // only compute deltas if this is an existing event.
                 // new events (being inserted into the Events table) won't
@@ -1894,8 +1897,8 @@ public class EditEvent extends Activity implements View.OnClickListener,
             ContentProviderResult[] results =
                 getContentResolver().applyBatch(android.provider.Calendar.AUTHORITY, ops);
             if (DEBUG) {
-                for (int i = 0; i < results.length; i++) {
-                    Log.v(TAG, "results = " + results[i].toString());
+                for (ContentProviderResult result : results) {
+                    Log.v(TAG, "results = " + result.toString());
                 }
             }
         } catch (RemoteException e) {
@@ -2041,19 +2044,16 @@ public class EditEvent extends Activity implements View.OnClickListener,
         }
 
         // Delete all the existing reminders for this event
-        String where = Reminders.EVENT_ID + "=?";
+        final String where = Reminders.EVENT_ID + "=?";
         String[] args = new String[] { Long.toString(eventId) };
         Builder b = ContentProviderOperation.newDelete(Reminders.CONTENT_URI);
         b.withSelection(where, args);
         ops.add(b.build());
 
         ContentValues values = new ContentValues();
-        int len = reminderMinutes.size();
 
         // Insert the new reminders, if any
-        for (int i = 0; i < len; i++) {
-            int minutes = reminderMinutes.get(i);
-
+        for (int minutes : reminderMinutes) {
             values.clear();
             values.put(Reminders.MINUTES, minutes);
             values.put(Reminders.METHOD, Reminders.METHOD_ALERT);
@@ -2079,12 +2079,9 @@ public class EditEvent extends Activity implements View.OnClickListener,
         ops.add(b.build());
 
         ContentValues values = new ContentValues();
-        int len = reminderMinutes.size();
 
         // Insert the new reminders, if any
-        for (int i = 0; i < len; i++) {
-            int minutes = reminderMinutes.get(i);
-
+        for (int minutes : reminderMinutes) {
             values.clear();
             values.put(Reminders.MINUTES, minutes);
             values.put(Reminders.METHOD, Reminders.METHOD_ALERT);
@@ -2103,16 +2100,17 @@ public class EditEvent extends Activity implements View.OnClickListener,
         }
 
         values.put(Events.RRULE, mRrule);
-        long end = mEndTime.toMillis(true /* ignore dst */);
-        long start = mStartTime.toMillis(true /* ignore dst */);
+        final long end = mEndTime.toMillis(true /* ignore dst */);
+        final long start = mStartTime.toMillis(true /* ignore dst */);
         String duration;
 
         boolean isAllDay = mAllDayCheckBox.isChecked();
         if (isAllDay) {
-            long days = (end - start + DateUtils.DAY_IN_MILLIS - 1) / DateUtils.DAY_IN_MILLIS;
+            final long days =
+                    (end - start + DateUtils.DAY_IN_MILLIS - 1) / DateUtils.DAY_IN_MILLIS;
             duration = "P" + days + "D";
         } else {
-            long seconds = (end - start) / DateUtils.SECOND_IN_MILLIS;
+            final long seconds = (end - start) / DateUtils.SECOND_IN_MILLIS;
             duration = "P" + seconds + "S";
         }
         values.put(Events.DURATION, duration);
@@ -2129,22 +2127,23 @@ public class EditEvent extends Activity implements View.OnClickListener,
     }
 
     private void updateRecurrenceRule() {
-        int position = mRepeatsSpinner.getSelectedItemPosition();
-        int selection = mRecurrenceIndexes.get(position);
+        final int position = mRepeatsSpinner.getSelectedItemPosition();
+        final int selection = mRecurrenceIndexes.get(position);
         // Make sure we don't have any leftover data from the previous setting
         clearRecurrence();
-
-        if (selection == DOES_NOT_REPEAT) {
+        switch(selection) {
+        case DOES_NOT_REPEAT:
             mRrule = null;
             return;
-        } else if (selection == REPEATS_CUSTOM) {
+        case REPEATS_CUSTOM:
             // Keep custom recurrence as before.
             return;
-        } else if (selection == REPEATS_DAILY) {
+        case REPEATS_DAILY:
             mEventRecurrence.freq = EventRecurrence.DAILY;
-        } else if (selection == REPEATS_EVERY_WEEKDAY) {
+            break;
+        case REPEATS_EVERY_WEEKDAY: {
             mEventRecurrence.freq = EventRecurrence.WEEKLY;
-            int dayCount = 5;
+            final int dayCount = 5;
             int[] byday = new int[dayCount];
             int[] bydayNum = new int[dayCount];
 
@@ -2160,10 +2159,12 @@ public class EditEvent extends Activity implements View.OnClickListener,
             mEventRecurrence.byday = byday;
             mEventRecurrence.bydayNum = bydayNum;
             mEventRecurrence.bydayCount = dayCount;
-        } else if (selection == REPEATS_WEEKLY_ON_DAY) {
+            break;
+        }
+        case REPEATS_WEEKLY_ON_DAY: {
             mEventRecurrence.freq = EventRecurrence.WEEKLY;
             int[] days = new int[1];
-            int dayCount = 1;
+            final int dayCount = 1;
             int[] dayNum = new int[dayCount];
 
             days[0] = EventRecurrence.timeDay2Day(mStartTime.weekDay);
@@ -2173,14 +2174,17 @@ public class EditEvent extends Activity implements View.OnClickListener,
             mEventRecurrence.byday = days;
             mEventRecurrence.bydayNum = dayNum;
             mEventRecurrence.bydayCount = dayCount;
-        } else if (selection == REPEATS_MONTHLY_ON_DAY) {
+            break;
+        }
+        case REPEATS_MONTHLY_ON_DAY:
             mEventRecurrence.freq = EventRecurrence.MONTHLY;
             mEventRecurrence.bydayCount = 0;
             mEventRecurrence.bymonthdayCount = 1;
             int[] bymonthday = new int[1];
             bymonthday[0] = mStartTime.monthDay;
             mEventRecurrence.bymonthday = bymonthday;
-        } else if (selection == REPEATS_MONTHLY_ON_DAY_COUNT) {
+            break;
+        case REPEATS_MONTHLY_ON_DAY_COUNT:
             mEventRecurrence.freq = EventRecurrence.MONTHLY;
             mEventRecurrence.bydayCount = 1;
             mEventRecurrence.bymonthdayCount = 0;
@@ -2196,8 +2200,10 @@ public class EditEvent extends Activity implements View.OnClickListener,
             byday[0] = EventRecurrence.timeDay2Day(mStartTime.weekDay);
             mEventRecurrence.byday = byday;
             mEventRecurrence.bydayNum = bydayNum;
-        } else if (selection == REPEATS_YEARLY) {
+            break;
+        case REPEATS_YEARLY:
             mEventRecurrence.freq = EventRecurrence.YEARLY;
+            break;
         }
 
         // Set the week start day.
@@ -2206,10 +2212,10 @@ public class EditEvent extends Activity implements View.OnClickListener,
     }
 
     private ContentValues getContentValuesFromUi() {
-        String title = mTitleTextView.getText().toString().trim();
-        boolean isAllDay = mAllDayCheckBox.isChecked();
-        String location = mLocationTextView.getText().toString().trim();
-        String description = mDescriptionTextView.getText().toString().trim();
+        final String title = mTitleTextView.getText().toString().trim();
+        final boolean isAllDay = mAllDayCheckBox.isChecked();
+        final String location = mLocationTextView.getText().toString().trim();
+        final String description = mDescriptionTextView.getText().toString().trim();
 
         ContentValues values = new ContentValues();
 
@@ -2274,17 +2280,17 @@ public class EditEvent extends Activity implements View.OnClickListener,
     }
 
     private boolean isEmpty() {
-        String title = mTitleTextView.getText().toString().trim();
+        final String title = mTitleTextView.getText().toString().trim();
         if (title.length() > 0) {
             return false;
         }
 
-        String location = mLocationTextView.getText().toString().trim();
+        final String location = mLocationTextView.getText().toString().trim();
         if (location.length() > 0) {
             return false;
         }
 
-        String description = mDescriptionTextView.getText().toString().trim();
+        final String description = mDescriptionTextView.getText().toString().trim();
         if (description.length() > 0) {
             return false;
         }

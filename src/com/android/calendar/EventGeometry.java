@@ -50,9 +50,9 @@ public class EventGeometry {
             return false;
         }
 
-        float cellMinuteHeight = mMinuteHeight;
-        int startDay = event.startDay;
-        int endDay = event.endDay;
+        final float cellMinuteHeight = mMinuteHeight;
+        final int startDay = event.startDay;
+        final int endDay = event.endDay;
 
         if (startDay > date || endDay < date) {
             return false;
@@ -73,9 +73,9 @@ public class EventGeometry {
             endTime = CalendarView.MINUTES_PER_DAY;
         }
 
-        int col = event.getColumn();
-        int maxCols = event.getMaxColumns();
-        int startHour = startTime / 60;
+        final int col = event.getColumn();
+        final int maxCols = event.getMaxColumns();
+        final int startHour = startTime / 60;
         int endHour = endTime / 60;
 
         // If the end point aligns on a cell boundary then count it as
@@ -97,7 +97,7 @@ public class EventGeometry {
             event.bottom = event.top + mMinEventHeight;
         }
 
-        float colWidth = (float) (cellWidth - 2 * mCellMargin) / (float) maxCols;
+        final float colWidth = (float) (cellWidth - 2 * mCellMargin) / (float) maxCols;
         event.left = left + mCellMargin + col * colWidth;
         event.right = event.left + colWidth;
         return true;
@@ -118,10 +118,10 @@ public class EventGeometry {
      * Computes the distance from the given point to the given event.
      */
     float pointToEvent(float x, float y, Event event) {
-        float left = event.left;
-        float right = event.right;
-        float top = event.top;
-        float bottom = event.bottom;
+        final float left = event.left;
+        final float right = event.right;
+        final float top = event.top;
+        final float bottom = event.bottom;
 
         if (x >= left) {
             if (x <= right) {

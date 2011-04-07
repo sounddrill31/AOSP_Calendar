@@ -60,11 +60,11 @@ public class AlertAdapter extends ResourceCursorAdapter {
         }
         */
         
-        String eventName = cursor.getString(AlertActivity.INDEX_TITLE);
-        String location = cursor.getString(AlertActivity.INDEX_EVENT_LOCATION);
-        long startMillis = cursor.getLong(AlertActivity.INDEX_BEGIN);
-        long endMillis = cursor.getLong(AlertActivity.INDEX_END);
-        boolean allDay = cursor.getInt(AlertActivity.INDEX_ALL_DAY) != 0;
+        final String eventName = cursor.getString(AlertActivity.INDEX_TITLE);
+        final String location = cursor.getString(AlertActivity.INDEX_EVENT_LOCATION);
+        final long startMillis = cursor.getLong(AlertActivity.INDEX_BEGIN);
+        final long endMillis = cursor.getLong(AlertActivity.INDEX_END);
+        final boolean allDay = cursor.getInt(AlertActivity.INDEX_ALL_DAY) != 0;
         
         updateView(context, view, eventName, location, startMillis, endMillis, allDay);
     }

@@ -308,8 +308,8 @@ public class AgendaByDayAdapter extends BaseAdapter {
         if (mRowInfo == null) {
             return 0;
         }
-        long millis = time.toMillis(false /* use isDst */);
-        int julianDay = Time.getJulianDay(millis, time.gmtoff);
+        final long millis = time.toMillis(false /* use isDst */);
+        final int julianDay = Time.getJulianDay(millis, time.gmtoff);
         int minDistance = 1000;  // some big number
         int minIndex = 0;
         int len = mRowInfo.size();
@@ -346,8 +346,7 @@ public class AgendaByDayAdapter extends BaseAdapter {
         int len = mRowInfo.size();
         if (position >= len) return 0;  // no row info at this position
 
-        for (int index = position; index >= 0; index--) {
-            RowInfo row = mRowInfo.get(index);
+        for (RowInfo row : mRowInfo) {
             if (row.mType == TYPE_DAY) {
                 return row.mData;
             }

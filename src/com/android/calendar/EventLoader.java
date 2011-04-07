@@ -84,16 +84,16 @@ public class EventLoader {
             //query which days have events
             Cursor cursor = EventDays.query(cr, startDay, numDays);
             try {
-                int startDayColumnIndex = cursor.getColumnIndexOrThrow(EventDays.STARTDAY);
-                int endDayColumnIndex = cursor.getColumnIndexOrThrow(EventDays.ENDDAY);
+                final int startDayColumnIndex = cursor.getColumnIndexOrThrow(EventDays.STARTDAY);
+                final int endDayColumnIndex = cursor.getColumnIndexOrThrow(EventDays.ENDDAY);
 
                 //Set all the days with events to true
                 while (cursor.moveToNext()) {
-                    int firstDay = cursor.getInt(startDayColumnIndex);
-                    int lastDay = cursor.getInt(endDayColumnIndex);
+                    final int firstDay = cursor.getInt(startDayColumnIndex);
+                    final int lastDay = cursor.getInt(endDayColumnIndex);
                     //we want the entire range the event occurs, but only within the month
-                    int firstIndex = Math.max(firstDay - startDay, 0);
-                    int lastIndex = Math.min(lastDay - startDay, 30);
+                    final int firstIndex = Math.max(firstDay - startDay, 0);
+                    final int lastIndex = Math.min(lastDay - startDay, 30);
 
                     for(int i = firstIndex; i <= lastIndex; i++) {
                         eventDays[i] = true;
