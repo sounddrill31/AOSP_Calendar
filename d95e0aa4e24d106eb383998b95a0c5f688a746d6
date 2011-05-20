@@ -1,0 +1,9 @@
+Change-Id: Id95e0aa4e24d106eb383998b95a0c5f688a746d6
+Code-Review+2: Jean-Baptiste Queru <jbq@google.com>
+Verified+1: Jean-Baptiste Queru <jbq@google.com>
+Code-Review+1: Jerry Brady <jerry.brady@gmail.com>
+Submitted-by: Jean-Baptiste Queru <jbq@google.com>
+Submitted-at: Fri, 30 Oct 2009 13:54:52 -0700
+Reviewed-on: https://review.source.android.com/12334
+Project: platform/packages/apps/Calendar
+Branch: refs/heads/master
