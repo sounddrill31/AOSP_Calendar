@@ -1,0 +1,8 @@
+Change-Id: Ib6f23cbf75cdac02a5e88c5804eb7199ea51efa3
+Verified+1: Jean-Baptiste Queru <jbq@google.com>
+Code-Review+2: Michael Chan <mchan@android.com>
+Submitted-by: Jean-Baptiste Queru <jbq@google.com>
+Submitted-at: Mon, 13 Feb 2012 14:32:24 -0800
+Reviewed-on: https://android-review.googlesource.com/32272
+Project: platform/packages/apps/Calendar
+Branch: refs/heads/master
