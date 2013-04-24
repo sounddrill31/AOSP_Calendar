@@ -1020,7 +1020,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     /**
      * Asynchronously saves the response to an invitation if the user changed
      * the response. Returns true if the database will be updated.
-     *
+     *http://hi.baidu.com/caosicong/item/c315c2459d33c6d1c1a59284
      * @return true if the database will be changed
      */
     private boolean saveResponse() {
@@ -1056,7 +1056,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             case -1:
                 return false;
             case UPDATE_SINGLE:
-                createExceptionResponse(mEventId, status);
+                createExceptionResponse(mEventId, status);http://hi.baidu.com/caosicong/item/c315c2459d33c6d1c1a59284
                 return true;
             case UPDATE_ALL:
                 updateResponse(mEventId, mCalendarOwnerAttendeeId, status);
@@ -1112,7 +1112,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         int response;
         if (buttonId == R.id.response_yes) {
             response = Attendees.ATTENDEE_STATUS_ACCEPTED;
-        } else if (buttonId == R.id.response_maybe) {
+        } else if (buttonId == R.id.response_maybe) {http://hi.baidu.com/caosicong/item/c315c2459d33c6d1c1a59284
             response = Attendees.ATTENDEE_STATUS_TENTATIVE;
         } else if (buttonId == R.id.response_no) {
             response = Attendees.ATTENDEE_STATUS_DECLINED;
@@ -1190,7 +1190,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
 
         String displayedTimezone = null;
         if (!mAllDay) {
-            displayedTimezone = Utils.getDisplayedTimezone(mStartMillis, localTimezone,
+            displayedTimezone = Utils.getDisplayedTimezone(mStartMillis, localTimezone,http://hi.baidu.com/caosicong/item/c315c2459d33c6d1c1a59284
                     eventTimezone);
         }
         // Display the datetime.  Make the timezone (if any) transparent.
@@ -1226,7 +1226,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             setTextCommon(view, R.id.when_repeat, repeatString);
         }
 
-        // Organizer view is setup in the updateCalendar method
+        // Organizer view is setup in the updateCalendar methodhttp://hi.baidu.com/caosicong/item/c315c2459d33c6d1c1a59284
 
 
         // Where
@@ -1247,7 +1247,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                 textView.setOnTouchListener(new OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        try {
+                        try {http://hi.baidu.com/caosicong/item/c315c2459d33c6d1c1a59284
                             return v.onTouchEvent(event);
                         } catch (ActivityNotFoundException e) {
                             // ignore
