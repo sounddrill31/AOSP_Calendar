@@ -35,7 +35,23 @@ LOCAL_SDK_VERSION := current
 
 LOCAL_RESOURCE_DIR := $(addprefix $(LOCAL_PATH)/, $(res_dirs))
 
+# Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+ifeq ($(PRODUCT_REQUIRES_ICAL_CALENDAR_FEATURE),true)
+   LOCAL_SRC_FILES += enable/src/com/motorola/calendar/utils/IcalConfig.java
+else
+   LOCAL_SRC_FILES += disable/src/com/motorola/calendar/utils/IcalConfig.java
+endif
+# End Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+
 LOCAL_PACKAGE_NAME := Calendar
+
+# Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+LOCAL_JAVA_LIBRARIES := \
+    com.motorola.calendarcommon
+
+LOCAL_REQUIRED_MODULES := \
+    com.motorola.calendarcommon
+# End Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
 
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags \
                              ../../../frameworks/opt/datetimepicker/proguard.flags

@@ -192,6 +192,10 @@ public class CalendarController {
          */
         public long extraLong;
 
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        public Bundle extras = new Bundle();
+        // End Motorola
+
         public boolean isAllDay() {
             if (eventType != EventType.VIEW_EVENT) {
                 Log.wtf(TAG, "illegal call to isAllDay , wrong event type " + eventType);
@@ -389,6 +393,55 @@ public class CalendarController {
         info.calendarId = calendarId;
         this.sendEvent(sender, info);
     }
+
+     // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+     /**
+      * The implementation of this method is a copy of sendEventRelatedEventWithExtra() plus
+      * setting more extras.
+      */
+    public void sendEventRelatedEventWithExtra(Object sender, long eventType, long eventId,
+            long startMillis, long endMillis, int x, int y, long extraLong, long selectedMillis,
+            Bundle extras/*extras added by MOTO comparing to AOSP*/) {
+        sendEventRelatedEventWithExtraWithTitleWithCalendarId(sender, eventType, eventId,
+            startMillis, endMillis, x, y, extraLong, selectedMillis, null, -1,
+            extras);//extras added by MOTO comparing to AOSP
+    }
+
+    /**
+     * The implementation of this method is a copy of sendEventRelatedEventWithExtraWithTitleWithCalendarId() plus
+     * setting more extras.
+     */
+    public void sendEventRelatedEventWithExtraWithTitleWithCalendarId(Object sender, long eventType,
+            long eventId, long startMillis, long endMillis, int x, int y, long extraLong,
+            long selectedMillis, String title, long calendarId,
+            Bundle extras/*extras added by MOTO comparing to AOSP*/) {
+        EventInfo info = new EventInfo();
+        info.eventType = eventType;
+        if (eventType == EventType.EDIT_EVENT || eventType == EventType.VIEW_EVENT_DETAILS) {
+            info.viewType = ViewType.CURRENT;
+        }
+
+        info.id = eventId;
+        info.startTime = new Time(Utils.getTimeZone(mContext, mUpdateTimezone));
+        info.startTime.set(startMillis);
+        if (selectedMillis != -1) {
+            info.selectedTime = new Time(Utils.getTimeZone(mContext, mUpdateTimezone));
+            info.selectedTime.set(selectedMillis);
+        } else {
+            info.selectedTime = info.startTime;
+        }
+        info.endTime = new Time(Utils.getTimeZone(mContext, mUpdateTimezone));
+        info.endTime.set(endMillis);
+        info.x = x;
+        info.y = y;
+        info.extraLong = extraLong;
+        info.eventTitle = title;
+        info.calendarId = calendarId;
+        info.extras = extras;// extras added by MOTO comparing to AOSP
+        this.sendEvent(sender, info);
+    }
+    // End Motorola
+
     /**
      * Helper for sending non-calendar-event events
      *

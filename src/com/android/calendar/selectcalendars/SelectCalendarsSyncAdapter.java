@@ -42,6 +42,10 @@ import com.android.calendar.selectcalendars.CalendarColorCache.OnCalendarColorsL
 
 import java.util.HashMap;
 
+// Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+import android.provider.CalendarContract;
+// End Motorola
+
 public class SelectCalendarsSyncAdapter extends BaseAdapter
         implements ListAdapter, AdapterView.OnItemClickListener, OnCalendarColorsLoadedListener {
     private static final String TAG = "SelCalsAdapter";
@@ -73,6 +77,10 @@ public class SelectCalendarsSyncAdapter extends BaseAdapter
 
     private final String mSyncedString;
     private final String mNotSyncedString;
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    private final String mPhoneCalendarString;
+    private final String mNonSyncable;
+    // End Motorola
 
     public class CalendarRow {
         long id;
@@ -100,6 +108,10 @@ public class SelectCalendarsSyncAdapter extends BaseAdapter
         Resources res = context.getResources();
         mSyncedString = res.getString(R.string.synced);
         mNotSyncedString = res.getString(R.string.not_synced);
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        mPhoneCalendarString = res.getString(R.string.phone_calendar);
+        mNonSyncable = res.getString(R.string.non_syncable);
+        // End Motorola
     }
 
     private void initData(Cursor c) {
@@ -148,6 +160,9 @@ public class SelectCalendarsSyncAdapter extends BaseAdapter
         if (position >= mRowCount) {
             return null;
         }
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        String accountType = mData[position].accountType;
+        // End Motorola
         String name = mData[position].displayName;
         boolean selected = mData[position].synced;
         int color = Utils.getDisplayColorFromColor(mData[position].color);
@@ -209,7 +224,15 @@ public class SelectCalendarsSyncAdapter extends BaseAdapter
             }
         });
 
-        setText(view, R.id.calendar, name);
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        if (CalendarContract.ACCOUNT_TYPE_LOCAL.equals(accountType)) {
+            setText(view, R.id.calendar, mPhoneCalendarString);
+            cb.setVisibility(View.GONE);
+            setText(view, R.id.status, mNonSyncable);
+        } else {
+            setText(view, R.id.calendar, name);
+        }
+        // End Motorola
         return view;
     }
 

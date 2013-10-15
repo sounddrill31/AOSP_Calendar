@@ -738,4 +738,16 @@
 
     <!-- Do Not Translate.  Sender identity for global notification synchronization. -->
     <string name="notification_sender_id"></string>
+
+    <!-- Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247 -->
+    <string name="invalid_event_time">Event time is invalid</string>
+    <string name="ics_save_label">Save</string>
+    <string name="replace_event_title">Previously saved event</string>
+    <string name="replace_event_message">This event has already been added to your calendar. Selecting \"Save\" will overwrite any changes or updates.</string>
+    <string name="phone_calendar">Device calendar</string>
+    <string name="phone_storage">Device storage</string>
+    <string name="non_syncable">non-syncable</string>
+    <!-- Toast message displayed when the iCal feature is not supported -->
+    <string name="ical_not_supported">View of ICS/VCS not supported</string>
+    <!-- End Motorola-->
 </resources>

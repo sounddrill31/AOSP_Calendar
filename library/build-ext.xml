@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="build-extension" default="added-help">
+    <!-- Motorola build targets -->
+    <property environment="env"/>
+
+    <target name="debugs" depends="debug, -post-build"
+                description="Builds the application (debug) and signs it with a test key.">
+    </target>
+    <target name="releases" depends="release, -post-build"
+                description="Builds the application (release) and signs it with a test key.">
+    </target>
+
+    <target name="-pre-setup" depends="-set-version-number, -set-mmi-addon">
+        <available file="${sdk.dir}/motorola" type="dir"
+            property="sdk.motorola.dir" value="${sdk.dir}/motorola" />
+    </target>
+
+    <target name="-post-build" depends="-set-extensible-lib, -dex-lib">
+        <!-- Revert out.final.file (if any) to out.packaged.file, so as to sign and zipalign again -->
+        <if>
+            <condition>
+                <resourceexists>
+                    <file file="${out.final.file}"/>
+                </resourceexists>
+            </condition>
+            <then>
+                <echo>Remove Package: ${out.final.file}</echo>
+                <delete file="${out.final.file}"/>
+            </then>
+        </if>
+
+        <!-- sign and zipalign -->
+        <antcall target="-sign-zipalign" />
+
+        <!-- copy the out file to normalized apk name -->
+        <do-only-if-not-library elseText="Library project: do not copy apk..." >
+            <property name="out.project.apk.file" location="${out.absolute.dir}/${ant.project.name}.apk" />
+            <copy overwrite="true" preservelastmodified="true"
+                file="${out.final.file}" tofile="${out.project.apk.file}" />
+        </do-only-if-not-library>
+    </target>
+
+    <target name="-set-version-number">
+        <script language="javascript"> <![CDATA[
+            var versionMajor = project.getProperty("version.major");
+            var versionMinor = project.getProperty("version.minor");
+            var buildNumber = project.getProperty("build.number");
+            if (buildNumber == null) buildNumber = 1;
+
+            var versionCode = parseInt(versionMajor) * 1000000
+                    + parseInt(versionMinor) * 10000 + parseInt(buildNumber);
+            var versionName = versionMajor + "." + versionMinor + "." + buildNumber;
+
+            project.setProperty("version.code", versionCode);
+            project.setProperty("version.name", versionName);
+            ]]>
+        </script>
+        <echo>version.code is ${version.code} </echo>
+        <echo>version.name is ${version.name} </echo>
+    </target>
+
+    <target name="-set-extensible-lib">
+        <do-only-if-extensible-library>
+            <property name="out.extensible.library.jar.file" location="${out.absolute.dir}/${ant.project.name}.jar" />
+            <property name="project.is.library" value="true" />
+        </do-only-if-extensible-library>
+    </target>
+
+    <target name="-dex-lib">
+        <do-only-if-extensible-library>
+            <echo>Extensible Library: need to convert jar to dex bytecode...</echo>
+            <dex-lib-helper />
+        </do-only-if-extensible-library>
+    </target>
+
+    <target name="-set-mmi-addon">
+        <if condition="${has.mmi.apps.home}">
+            <then>
+                <property name="sdk.mmi.dir" value="${env.MMI_APPS_HOME}" />
+            </then>
+            <else>
+                <echo>Find MMI App SDK directory...</echo>
+                <dirset id="sdk.mmi.dirset" dir="${sdk.dir}/add-ons" includes="mmi_apps_sdk*" />
+                <property name="sdk.mmi.basedir" refid="sdk.mmi.dirset"/>
+                <if>
+                    <condition>
+                        <length string="${sdk.mmi.basedir}" trim="true" when="equal" length="0" />
+                    </condition>
+                    <then>
+                        <fail message="Missing MMI App SDK directory." />
+                    </then>
+                </if>
+                <property name="sdk.mmi.dir" value="${sdk.dir}/add-ons/${sdk.mmi.basedir}" />
+            </else>
+        </if>
+        <echo>MMI App SDK dir is '${sdk.mmi.dir}'</echo>
+    </target>
+
+    <condition property="has.mmi.apps.home" value="true" else="false">
+        <and>
+            <isset property="env.MMI_APPS_HOME" />
+            <length string="${env.MMI_APPS_HOME}" when="greater" length="0" />
+        </and>
+    </condition>
+
+    <condition property="project.is.extensible.library" value="true" else="false">
+        <istrue value="${extensible.library}" />
+    </condition>
+
+    <!-- macro to do a task on if is.extensible.library is set. -->
+    <macrodef name="do-only-if-extensible-library">
+        <element name="task-to-do" implicit="yes" />
+        <sequential>
+            <if condition="${project.is.extensible.library}">
+            <then>
+                <task-to-do />
+            </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <!-- Configurable macro, which allows to pass as parameters output directory,
+         output dex filename and external libraries to dex (optional) -->
+    <macrodef name="dex-lib-helper">
+        <element name="external-libs" optional="yes" />
+        <attribute name="nolocals" default="false" />
+        <sequential>
+            <!-- sets the primary input for dex. If a pre-dex task sets it to
+                 something else this has no effect -->
+            <property name="out.dex.input.absolute.file" location="${out.absolute.dir}/classes.jar" />
+
+            <!-- set the secondary dx input: the project (and library) jar files
+                 If a pre-dex task sets it to something else this has no effect -->
+            <if>
+                <condition>
+                    <isreference refid="out.dex.jar.input.ref" />
+                </condition>
+                <else>
+                    <path id="out.dex.jar.input.ref">
+                        <path refid="jar.libs.ref" />
+                    </path>
+                </else>
+            </if>
+
+            <dex executable="${dx}"
+                    output="${intermediate.dex.file}"
+                    nolocals="@{nolocals}"
+                    verbose="${verbose}">
+                <path path="${out.dex.input.absolute.file}"/>
+                <path refid="out.dex.jar.input.ref" />
+                <external-libs />
+            </dex>
+
+            <jar destfile="${out.extensible.library.jar.file}"
+                basedir="${out.absolute.dir}"
+                includes="${dex.file.name}" />
+        </sequential>
+    </macrodef>
+
+    <!-- This macro signs in.package and outputs it to out.package using in.certificate. -->
+    <macrodef name="signapk-helper">
+        <attribute name="in.certificate.class" default="testkey" />
+        <attribute name="in.package" />
+        <attribute name="out.package" />
+        <sequential>
+            <condition property="signjar.certs.dir" value="${sdk.motorola.dir}" else="${sdk.mmi.dir}/certs">
+                <isset property="sdk.motorola.dir" />
+            </condition>
+            <condition property="signjar.file" value="${sdk.motorola.dir}/signapk.jar" else="${sdk.mmi.dir}/tools/signapk.jar">
+                <isset property="sdk.motorola.dir" />
+            </condition>
+            <java jar="${signjar.file}" fork="true">
+                <arg value="${signjar.certs.dir}/@{in.certificate.class}.x509.pem"/>
+                <arg value="${signjar.certs.dir}/@{in.certificate.class}.pk8"/>
+                <arg value="@{in.package}"/>
+                <arg value="@{out.package}"/>
+            </java>
+        </sequential>
+    </macrodef>
+
+    <target name="-sign-zipalign">
+        <!-- Signapk -->
+        <condition property="out.signapk.input.file" value="${out.extensible.library.jar.file}" else="${out.packaged.file}">
+            <istrue value="${extensible.library}" />
+        </condition>
+        <condition property="sign.certificate" value="testkey">
+            <not> <isset property="sign.certificate" /> </not>
+        </condition>
+        <echo>Signing ${out.signapk.input.file} with '${sign.certificate}' certificate</echo>
+        <move file="${out.signapk.input.file}" tofile="${out.signapk.input.file}_unsigned"/>
+        <signapk-helper in.certificate.class="${sign.certificate}"
+            in.package="${out.signapk.input.file}_unsigned"
+            out.package="${out.signapk.input.file}" />
+        <delete file="${out.signapk.input.file}_unsigned"/>
+
+        <!-- Zipalign -->
+        <!-- only create aligned apk if *not* a library project -->
+        <do-only-if-not-library elseText="Library project: do not create apk..." >
+            <sequential>
+                <zipalign-helper in.package="${out.packaged.file}" out.package="${out.final.file}" />
+                <echo>Zipalign'd Package: ${out.final.file}</echo>
+            </sequential>
+        </do-only-if-not-library>
+    </target>
+
+    <!-- FindBugs -->
+    <condition property="has.findbugs.home" value="true" else="false">
+        <and>
+            <isset property="env.FINDBUGS_HOME" />
+            <length string="${env.FINDBUGS_HOME}" when="greater" length="0" />
+        </and>
+    </condition>
+
+    <target name="findbugs" depends="-compile">
+        <if condition="${has.findbugs.home}">
+            <then>
+                <property name="findbugs.dir" location="${env.FINDBUGS_HOME}" />
+
+                <!-- Add FindBugs Tasks -->
+                <property name="findbugs.ant.jar" location="${findbugs.dir}/lib/findbugs-ant.jar" />
+                <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${findbugs.ant.jar}" />
+
+                <path id="findbugs.aux.classpath">
+                    <fileset dir="${extensible.libs.classpath}" includes="*.jar" />
+                    <fileset dir="${jar.libs.absolute.dir}" includes="*.jar" />
+                    <path refid="project.libraries.jars" />
+                    <path refid="android.target.classpath" />
+                </path>
+
+                <property name="findbugs.output" value="xml" />
+                <property name="findbugs.level" value="high" />
+                <property name="findbugs.exclude.filter" location="findbugs.exclude.filter" />
+                <property name="out.findbugs.report.file" location="${out.absolute.dir}/${ant.project.name}-findbugs.${findbugs.output}" />
+
+                <findbugs output="${findbugs.output}" home="${findbugs.dir}" reportLevel="${findbugs.level}"
+                        outputFile="${out.findbugs.report.file}" excludeFilter="${findbugs.exclude.filter}">
+                    <class location="${out.classes.absolute.dir}" />
+                    <sourcePath path="${source.absolute.dir}" />
+                    <auxClasspath refId="findbugs.aux.classpath" />
+                </findbugs>
+            </then>
+            <else>
+                <echo>WARNING! Fail to *findbugs*, missing $FINDBUGS_HOME ...</echo>
+            </else>
+        </if>
+    </target>
+
+    <target name="installds" depends="-set-debug-files, -set-extensible-lib, installs"
+            description="Installs (only) the debug package to system folder." />
+    <target name="installrs" depends="-set-release-mode, -set-extensible-lib, installs"
+            description="Installs (only) the release package to system folder." />
+
+    <target name="installs"
+                description="Replace the apk with the newly build package. Must be used in conjunction with a build target
+                            (debug/release/instrument)." >
+        <!-- only do install if *not* a library project -->
+        <do-only-if-not-library elseText="Library project: nothing to install!" >
+            <if>
+                <condition>
+                    <isset property="out.final.file" />
+                </condition>
+                <then>
+                    <if>
+                        <condition>
+                            <resourceexists>
+                                <file file="${out.final.file}"/>
+                            </resourceexists>
+                        </condition>
+                        <then>
+                            <exec executable="${adb}" failonerror="true">
+                                <arg line="${adb.device.arg}" />
+                                <arg value="remount"/>
+                            </exec>
+                            <echo>Replacing ${out.final.file} onto system partition of default emulator or device...</echo>
+                            <exec executable="${adb}" failonerror="true">
+                                <arg line="${adb.device.arg}" />
+                                <arg value="shell"/>
+                                <arg value="rm /system/app/${ant.project.name}.*"/>
+                            </exec>
+                            <exec executable="${adb}" failonerror="true">
+                                <arg line="${adb.device.arg}" />
+                                <arg value="push"/>
+                                <arg value="${out.final.file}"/>
+                                <arg value="/system/app/${ant.project.name}.apk"/>
+                            </exec>
+                        </then>
+                        <else>
+                            <fail message="File {out.final.file} does not exist." />
+                        </else>
+                    </if>
+                </then>
+                <else>
+                    <echo>Install file not specified.</echo>
+                    <echo></echo>
+                    <echo>'ant installs' now requires the build target to be specified as well.</echo>
+                    <echo></echo>
+                    <echo></echo>
+                    <echo>    ant debug installs</echo>
+                    <echo>    ant debugs installs</echo>
+                    <echo>'ant debug' will build the given package</echo>
+                    <echo>'ant debugs' will build the given package and sign with a key</echo>
+                    <echo></echo>
+                    <echo>Alternatively, you can use</echo>
+                    <echo>    ant installrs</echo>
+                    <echo>    ant installds</echo>
+                    <echo>to only install an existing (release/debug) package (this will not rebuild the package.)</echo>
+                    <fail />
+                </else>
+            </if>
+        </do-only-if-not-library>
+
+        <do-only-if-extensible-library>
+            <property name="out.installsystem.jar.file" location="${out.extensible.library.jar.file}" />
+            <property name="out.installsystem.xml.file" location="${ant.project.name}.xml" />
+            <if>
+                <condition>
+                    <resourceexists>
+                        <file file="${out.installsystem.jar.file}" />
+                    </resourceexists>
+                </condition>
+                <then>
+                    <exec executable="${adb}" failonerror="true">
+                        <arg line="${adb.device.arg}" />
+                        <arg value="remount"/>
+                    </exec>
+                    <echo>Install ${out.installsystem.jar.file} onto system partition...</echo>
+                    <exec executable="${adb}" failonerror="true">
+                        <arg line="${adb.device.arg}" />
+                        <arg value="shell"/>
+                        <arg value="rm /system/framework/${ant.project.name}.jar"/>
+                    </exec>
+                    <exec executable="${adb}" failonerror="true">
+                        <arg line="${adb.device.arg}" />
+                        <arg value="push"/>
+                        <arg value="${out.installsystem.jar.file}"/>
+                        <arg value="/system/framework"/>
+                    </exec>
+                    <echo>Install ${out.installsystem.xml.file} onto system partition...</echo>
+                    <exec executable="${adb}" failonerror="true">
+                        <arg line="${adb.device.arg}" />
+                        <arg value="push"/>
+                        <arg value="${out.installsystem.xml.file}"/>
+                        <arg value="/system/etc/permissions"/>
+                    </exec>
+                </then>
+                <else>
+                    <fail message="File {out.installsystem.jar.file} does not exist." />
+                </else>
+            </if>
+        </do-only-if-extensible-library>
+    </target>
+
+    <target name="added-help" depends="help">
+        <echo>Below targets are added by Richard MENG (rgmeng@motorola.com)</echo>
+        <echo></echo>
+        <!-- displays starts at col 13
+              |13                                                              80| -->
+        <echo>   debugs:         Builds the application in debug mode and signs</echo>
+        <echo>                   the target with a certificate.</echo>
+        <echo>   releases:       Builds the application in release mode and signs</echo>
+        <echo>                   the target with a certificate.</echo>
+        <echo>   installs:       Install the newly build (releases/debugs) target</echo>
+        <echo>                   to /system/app. The new target must be in place.</echo>
+        <echo>   installrs:      Install (only) the (release) target to /system/app.</echo>
+        <echo>   installds:      Install (only) the (debug) target to /system/app.</echo>
+    </target>
+
+</project>

@@ -122,8 +122,10 @@ public class SelectCalendarsSyncFragment extends ListFragment
     @Override
     public void onResume() {
         super.onResume();
-        if (!ContentResolver.getMasterSyncAutomatically()
-                || !ContentResolver.getSyncAutomatically(mAccount, CalendarContract.AUTHORITY)) {
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        if (!isLocalAccount() && (!ContentResolver.getMasterSyncAutomatically()
+                || !ContentResolver.getSyncAutomatically(mAccount, CalendarContract.AUTHORITY))) {
+        // End Motorola
             Resources res = getActivity().getResources();
             mSyncStatus.setText(res.getString(R.string.acct_not_synced));
             mSyncStatus.setVisibility(View.VISIBLE);
@@ -199,7 +201,13 @@ public class SelectCalendarsSyncFragment extends ListFragment
         } else {
             adapter.changeCursor(data);
         }
-        getListView().setOnItemClickListener(adapter);
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        if (isLocalAccount()) {
+            getListView().setEnabled(false);
+        } else {
+            getListView().setOnItemClickListener(adapter);
+        }
+        // End Motorola
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -214,4 +222,10 @@ public class SelectCalendarsSyncFragment extends ListFragment
         intent.setAction("android.settings.SYNC_SETTINGS");
         getActivity().startActivity(intent);
     }
+
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    private boolean isLocalAccount() {
+        return CalendarContract.ACCOUNT_TYPE_LOCAL.equals(mAccount.type);
+    }
+    // End Motorola
 }

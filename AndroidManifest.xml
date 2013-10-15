@@ -50,6 +50,10 @@
         <meta-data android:name="com.google.android.backup.api_key"
                 android:value="AEdPqrEAAAAIM256oVOGnuSel5QKDpL8je_T65ZI8rFnDinssA" />
 
+        <!-- Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247 -->
+        <uses-library android:name="com.motorola.calendarcommon"/>
+        <!-- End Motorola -->
+
         <activity
             android:name="AllInOneActivity"
             android:theme="@style/CalendarTheme.WithActionBar"
@@ -232,6 +236,23 @@
         </service>
 
         <service android:name=".AsyncQueryServiceHelper" />
+
+        <!-- Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247 -->
+        <!-- Declarations for ICS -->
+        <activity android:name="com.android.calendar.ics.IcsViewActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/calendar"/>
+                <data android:mimeType="application/ics"/>
+                <data android:mimeType="text/x-vcalendar"/>
+                <data android:mimeType="text/x-vCalendar"/>
+                <data android:mimeType="application/vcs"/>
+            </intent-filter>
+        </activity>
+
+        <service android:name="com.android.calendar.ics.IcsService" />
+        <!-- End Motorola -->
 
     </application>
 </manifest>

@@ -23,6 +23,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.provider.CalendarContract;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
 import android.provider.CalendarContract.Calendars;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -83,6 +84,11 @@ public class SelectCalendarsSimpleAdapter extends BaseAdapter implements ListAda
 
     private CalendarColorCache mCache;
 
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    private final String mPhoneCalendarStr;
+    private final String mPhoneStorageStr;
+    // End Motorola
+
     private class CalendarRow {
         long id;
         String displayName;
@@ -119,6 +125,11 @@ public class SelectCalendarsSimpleAdapter extends BaseAdapter implements ListAda
         mIsTablet = Utils.getConfigBool(context, R.bool.tablet_config);
         mColorViewTouchAreaIncrease = context.getResources()
                 .getDimensionPixelSize(R.dimen.color_view_touch_area_increase);
+
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        mPhoneCalendarStr = context.getResources().getString(R.string.phone_calendar);
+        mPhoneStorageStr = context.getResources().getString(R.string.phone_storage);
+        // End Motorola
     }
 
     private static class TabletCalendarItemBackgrounds {
@@ -218,6 +229,9 @@ public class SelectCalendarsSimpleAdapter extends BaseAdapter implements ListAda
         if (position >= mRowCount) {
             return null;
         }
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        String accountType = mData[position].accountType;
+        // End Motorola
         String name = mData[position].displayName;
         boolean selected = mData[position].selected;
 
@@ -245,7 +259,14 @@ public class SelectCalendarsSimpleAdapter extends BaseAdapter implements ListAda
         }
 
         TextView calendarName = (TextView) view.findViewById(R.id.calendar);
-        calendarName.setText(name);
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        boolean isLocalAccount = CalendarContract.ACCOUNT_TYPE_LOCAL.equals(accountType);
+        if (isLocalAccount) {
+            calendarName.setText(mPhoneCalendarStr);
+        } else {
+            calendarName.setText(name);
+        }
+        // End Motorola
 
         View colorView = view.findViewById(R.id.color);
         colorView.setBackgroundColor(color);
@@ -296,7 +317,13 @@ public class SelectCalendarsSimpleAdapter extends BaseAdapter implements ListAda
                 } else {
                     secondaryColor = mColorCalendarSecondaryHidden;
                 }
-                secondaryText.setText(mData[position].ownerAccount);
+                // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+                if (isLocalAccount) {
+                    secondaryText.setText(mPhoneStorageStr);
+                } else {
+                    secondaryText.setText(mData[position].ownerAccount);
+                }
+                // End Motorola
                 secondaryText.setTextColor(secondaryColor);
                 secondaryText.setVisibility(View.VISIBLE);
                 layoutParam.height = LayoutParams.WRAP_CONTENT;

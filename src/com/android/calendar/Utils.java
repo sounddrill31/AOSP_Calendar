@@ -2100,4 +2100,15 @@ public class Utils {
         return reminders;
     }
 
+ // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    public static boolean disableForwardShareFeatures(Context c) {
+        // return Utils.getConfigBool(c, R.bool.disable_forward_share_features);
+        return true;
+    }
+
+    public static boolean disableiCalFeatures(Context c) {
+        //return Utils.getConfigBool(c, R.bool.disable_ical_feature);
+        return true;
+    }
+ // End Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
 }

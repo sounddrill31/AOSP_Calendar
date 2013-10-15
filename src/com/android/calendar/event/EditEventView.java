@@ -160,6 +160,10 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
     View mAttendeesGroup;
     View mStartHomeGroup;
     View mEndHomeGroup;
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    View mAvailability;
+    View mVisibility;
+    // End Motorola
 
     private int[] mOriginalPadding = new int[4];
 
@@ -541,14 +545,33 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
                         .getInt(colorColumn)));
             }
 
+            // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+            int typeColumn = cursor.getColumnIndexOrThrow(Calendars.ACCOUNT_TYPE);
+            boolean isLocalAccount = CalendarContract.ACCOUNT_TYPE_LOCAL.equals(
+                    cursor.getString(typeColumn));
+            Resources res = context.getResources();
+            final String phoneCalStr = res.getString(R.string.phone_calendar);
+            final String phoneStorageStr = res.getString(R.string.phone_storage);
+            // End Motorola
             TextView name = (TextView) view.findViewById(R.id.calendar_name);
             if (name != null) {
                 String displayName = cursor.getString(nameColumn);
-                name.setText(displayName);
-
+                // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+                if (isLocalAccount) {
+                    name.setText(phoneCalStr);
+                } else {
+                    name.setText(displayName);
+                }
+                // End Motorola
                 TextView accountName = (TextView) view.findViewById(R.id.account_name);
                 if (accountName != null) {
-                    accountName.setText(cursor.getString(ownerColumn));
+                    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+                    if (isLocalAccount) {
+                        accountName.setText(phoneStorageStr);
+                    } else {
+                        accountName.setText(cursor.getString(ownerColumn));
+                    }
+                    // End Motorola
                     accountName.setVisibility(TextView.VISIBLE);
                 }
             }
@@ -899,6 +922,11 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
         mEmailValidator = new Rfc822Validator(null);
         initMultiAutoCompleteTextView((RecipientEditTextView) mAttendeesList);
 
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        mAvailability = view.findViewById(R.id.availability_row);
+        mVisibility = view.findViewById(R.id.visibility_row);
+        // End Motorola
+
         // Display loading screen
         setModel(null);
 
@@ -1200,10 +1228,24 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
             View calendarGroup = mView.findViewById(R.id.calendar_selector_group);
             calendarGroup.setVisibility(View.GONE);
             TextView tv = (TextView) mView.findViewById(R.id.calendar_textview);
-            tv.setText(model.mCalendarDisplayName);
+            // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+            if (tv != null) {
+                if (CalendarContract.ACCOUNT_TYPE_LOCAL.equals(model.mSyncAccountType)) {
+                    tv.setText(R.string.phone_calendar);
+                } else {
+                    tv.setText(model.mCalendarDisplayName);
+                }
+            }
+            // End Motorola
             tv = (TextView) mView.findViewById(R.id.calendar_textview_secondary);
             if (tv != null) {
-                tv.setText(model.mOwnerAccount);
+                // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+                if (CalendarContract.ACCOUNT_TYPE_LOCAL.equals(model.mSyncAccountType)) {
+                    tv.setText(R.string.phone_storage);
+                } else {
+                    tv.setText(model.mOwnerAccount);
+                }
+                // End Motorola
             }
         } else {
             View calendarGroup = mView.findViewById(R.id.calendar_group);
@@ -1457,6 +1499,25 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
             mDescriptionGroup.setVisibility(View.VISIBLE);
         }
         setAllDayViewsVisibility(mAllDayCheckBox.isChecked());
+
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        if (CalendarContract.ACCOUNT_TYPE_LOCAL.equals(mModel.mSyncAccountType)) {
+            mAttendeesGroup.setVisibility(View.GONE);
+            mAvailability.setVisibility(View.GONE);
+            mVisibility.setVisibility(View.GONE);
+        } else {
+            if ("com.android.exchange".equals(mModel.mSyncAccountType)
+                    && (!TextUtils.isEmpty(mModel.mOriginalSyncId) || mode == Utils.MODIFY_SELECTED)) {
+                // Hide attendees if it is an exception event or try to create
+                // one. (Eas Only)
+                mAttendeesGroup.setVisibility(View.GONE);
+            } else {
+                mAttendeesGroup.setVisibility(View.VISIBLE);
+            }
+            mAvailability.setVisibility(View.VISIBLE);
+            mVisibility.setVisibility(View.VISIBLE);
+        }
+        // End Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
     }
 
     public void setModification(int modifyWhich) {
@@ -1776,6 +1837,12 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
         reminderLayout.removeAllViews();
         prepareReminders();
         prepareAvailability();
+
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        int typeColumn = c.getColumnIndexOrThrow(Calendars.ACCOUNT_TYPE);
+        mModel.mSyncAccountType = c.getString(typeColumn);
+        updateView();
+        // End Motorola, IKJB42MAIN-55
     }
 
     /**

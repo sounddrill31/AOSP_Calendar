@@ -54,6 +54,7 @@ import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Colors;
 import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Reminders;
+import android.provider.CalendarContract.ExtendedProperties;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.ContactsContract.Intents;
@@ -114,6 +115,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+// Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+import java.util.TimeZone;
+import android.app.AlertDialog;
+import android.text.format.DateUtils;
+import com.android.calendar.ics.IcsConstants;
+import com.motorola.calendarcommon.vcal.common.VCalConstants;
+import com.motorola.calendarcommon.vcal.VCalUtils;
+// End Motorola
+
 public class EventInfoFragment extends DialogFragment implements OnCheckedChangeListener,
         CalendarController.EventHandler, OnClickListener, DeleteEventHelper.DeleteNotifyListener,
         OnColorSelectedListener {
@@ -147,6 +157,10 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     protected static final String BUNDLE_KEY_REMINDER_MINUTES = "key_reminder_minutes";
     protected static final String BUNDLE_KEY_REMINDER_METHODS = "key_reminder_methods";
 
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    protected static final String BUNDLE_KEY_SYNC_ACCOUNT_TYPE = "key_sync_account_type";
+    protected static final String BUNDLE_KEY_IS_ICS_IMPORT = "key_fragment_is_ics_import";
+    // End Motorola
 
     private static final String PERIOD_SPACE = ". ";
 
@@ -173,10 +187,12 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     private static final int TOKEN_QUERY_REMINDERS = 1 << 4;
     private static final int TOKEN_QUERY_VISIBLE_CALENDARS = 1 << 5;
     private static final int TOKEN_QUERY_COLORS = 1 << 6;
+    private static final int TOKEN_QUERY_EXTENDED_PROPERTIES = 1 << 7;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
 
     private static final int TOKEN_QUERY_ALL = TOKEN_QUERY_DUPLICATE_CALENDARS
             | TOKEN_QUERY_ATTENDEES | TOKEN_QUERY_CALENDARS | TOKEN_QUERY_EVENT
-            | TOKEN_QUERY_REMINDERS | TOKEN_QUERY_VISIBLE_CALENDARS | TOKEN_QUERY_COLORS;
+            | TOKEN_QUERY_REMINDERS | TOKEN_QUERY_VISIBLE_CALENDARS | TOKEN_QUERY_COLORS
+            | TOKEN_QUERY_EXTENDED_PROPERTIES;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
 
     private int mCurrentQuery = 0;
 
@@ -203,22 +219,25 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         Events.CUSTOM_APP_URI,       // 19
         Events.DTEND,                // 20
         Events.DURATION,             // 21
-        Events.ORIGINAL_SYNC_ID      // 22 do not remove; used in DeleteEventHelper
+        Events.ORIGINAL_SYNC_ID,     // 22 do not remove; used in DeleteEventHelper
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        Events.AVAILABILITY,         // 24
+        // End Motorola
     };
     private static final int EVENT_INDEX_ID = 0;
-    private static final int EVENT_INDEX_TITLE = 1;
-    private static final int EVENT_INDEX_RRULE = 2;
-    private static final int EVENT_INDEX_ALL_DAY = 3;
-    private static final int EVENT_INDEX_CALENDAR_ID = 4;
+    public static final int EVENT_INDEX_TITLE = 1;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, change to public
+    public static final int EVENT_INDEX_RRULE = 2;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, change to public
+    public static final int EVENT_INDEX_ALL_DAY = 3;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, change to public
+    public static final int EVENT_INDEX_CALENDAR_ID = 4;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, change to public
     private static final int EVENT_INDEX_DTSTART = 5;
     private static final int EVENT_INDEX_SYNC_ID = 6;
-    private static final int EVENT_INDEX_EVENT_TIMEZONE = 7;
-    private static final int EVENT_INDEX_DESCRIPTION = 8;
-    private static final int EVENT_INDEX_EVENT_LOCATION = 9;
-    private static final int EVENT_INDEX_ACCESS_LEVEL = 10;
+    public static final int EVENT_INDEX_EVENT_TIMEZONE = 7;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, change to public
+    public static final int EVENT_INDEX_DESCRIPTION = 8;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, change to public
+    public static final int EVENT_INDEX_EVENT_LOCATION = 9;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, change to public
+    public static final int EVENT_INDEX_ACCESS_LEVEL = 10;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, change to public
     private static final int EVENT_INDEX_CALENDAR_COLOR = 11;
     private static final int EVENT_INDEX_EVENT_COLOR = 12;
-    private static final int EVENT_INDEX_HAS_ATTENDEE_DATA = 13;
+    public static final int EVENT_INDEX_HAS_ATTENDEE_DATA = 13;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, change to public
     private static final int EVENT_INDEX_ORGANIZER = 14;
     private static final int EVENT_INDEX_HAS_ALARM = 15;
     private static final int EVENT_INDEX_MAX_REMINDERS = 16;
@@ -226,7 +245,12 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     private static final int EVENT_INDEX_CUSTOM_APP_PACKAGE = 18;
     private static final int EVENT_INDEX_CUSTOM_APP_URI = 19;
     private static final int EVENT_INDEX_DTEND = 20;
-    private static final int EVENT_INDEX_DURATION = 21;
+    public static final int EVENT_INDEX_DURATION = 21;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, change to public
+
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    private static final int EVENT_INDEX_ORIGINAL_SYNC_ID = 22;
+    public static final int EVENT_INDEX_AVAILABILITY = 23;
+    // End Motorola
 
     private static final String[] ATTENDEES_PROJECTION = new String[] {
         Attendees._ID,                      // 0
@@ -287,6 +311,19 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
 
     static final String CALENDARS_WHERE = Calendars._ID + "=?";
     static final String CALENDARS_DUPLICATE_NAME_WHERE = Calendars.CALENDAR_DISPLAY_NAME + "=?";
+
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    private static final String[] EXTENDED_PROPERTIES_PROJECTION = new String[] {
+        ExtendedProperties._ID,            // 0
+        ExtendedProperties.NAME,           // 1
+        ExtendedProperties.VALUE           // 2
+    };
+    private static final int EXTENDED_PROPERTIES_INDEX_ID = 0;
+    private static final int EXTENDED_PROPERTIES_INDEX_NAME = 1;
+    private static final int EXTENDED_PROPERTIES_INDEX_VALUE = 2;
+
+    static final String EXTENDED_PROPERTIES_WHERE = ExtendedProperties.EVENT_ID + "=?";
+    // End Motorola
     static final String CALENDARS_VISIBLE_WHERE = Calendars.VISIBLE + "=?";
 
     static final String[] COLORS_PROJECTION = new String[] {
@@ -309,6 +346,9 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     private Cursor mAttendeesCursor;
     private Cursor mCalendarsCursor;
     private Cursor mRemindersCursor;
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    private Cursor mExtendedPropertiesCursor;
+    // End Motorola
 
     private static float mScale = 0; // Used for supporting different screen densities
 
@@ -447,13 +487,25 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
 
     private CalendarController mController;
 
-    private class QueryHandler extends AsyncQueryService {
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    private String mSyncAccountType;
+    private boolean mIsIcsImport = false;
+    private String mEventUID = null;
+    private AlertDialog mReplaceEventDialog = null;
+    // End Motorola
+
+    public class QueryHandler extends AsyncQueryService {//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, change to public
         public QueryHandler(Context context) {
             super(context);
         }
 
         @Override
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+            // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+            if (cursor == null) {
+                return;
+            }
+            // End Motorola
             // if the activity is finishing, then close the cursor and return
             final Activity activity = getActivity();
             if (activity == null || activity.isFinishing()) {
@@ -492,7 +544,9 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                 prepareReminders();
 
                 // start calendar query
-                Uri uri = Calendars.CONTENT_URI;
+                // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+                Uri uri = IcalInfoUtils.decorateForScratch(Calendars.CONTENT_URI,mIsIcsImport);
+                // End Motorola
                 String[] args = new String[] {
                         Long.toString(mEventCursor.getLong(EVENT_INDEX_CALENDAR_ID))};
                 startQuery(TOKEN_QUERY_CALENDARS, null, uri, CALENDARS_PROJECTION,
@@ -515,7 +569,9 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                     args = new String[] { Long.toString(mEventId) };
 
                     // start attendees query
-                    uri = Attendees.CONTENT_URI;
+                    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+                    uri = IcalInfoUtils.decorateForScratch(Attendees.CONTENT_URI,mIsIcsImport);
+                    // End Motorola
                     startQuery(TOKEN_QUERY_ATTENDEES, null, uri, ATTENDEES_PROJECTION,
                             ATTENDEES_WHERE, args, ATTENDEES_SORT_ORDER);
                 } else {
@@ -524,12 +580,28 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                 if (mHasAlarm) {
                     // start reminders query
                     args = new String[] { Long.toString(mEventId) };
-                    uri = Reminders.CONTENT_URI;
+                    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+                    uri = IcalInfoUtils.decorateForScratch(Reminders.CONTENT_URI,mIsIcsImport);
+                    // End Motorola
                     startQuery(TOKEN_QUERY_REMINDERS, null, uri,
                             REMINDERS_PROJECTION, REMINDERS_WHERE, args, null);
                 } else {
                     sendAccessibilityEventIfQueryDone(TOKEN_QUERY_REMINDERS);
                 }
+                // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+                // TOKEN_EXTENDED_PROPERTIES
+                // Only need query ExtendedProperties when it's an ICS imported event
+                if (mIsIcsImport) {
+                    args = new String[] { Long.toString(mEventId) };
+                    uri = ExtendedProperties.CONTENT_URI;
+                    startQuery(TOKEN_QUERY_EXTENDED_PROPERTIES, null, uri,
+                            EXTENDED_PROPERTIES_PROJECTION,
+                            EXTENDED_PROPERTIES_WHERE,
+                            args, null);
+                } else {
+                    sendAccessibilityEventIfQueryDone(TOKEN_QUERY_EXTENDED_PROPERTIES);
+                }
+                // End Motorola
                 break;
             case TOKEN_QUERY_COLORS:
                 ArrayList<Integer> colors = new ArrayList<Integer>();
@@ -607,6 +679,12 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                 setVisibilityCommon(mView, R.id.calendar_container, View.VISIBLE);
                 setTextCommon(mView, R.id.calendar_name, sb);
                 break;
+            // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+            case TOKEN_QUERY_EXTENDED_PROPERTIES:
+                 mExtendedPropertiesCursor = Utils.matrixCursorFromCursor(cursor);
+                 initExtendedProperties(mView, mExtendedPropertiesCursor);
+                 break;
+            // End Motorola
             }
             cursor.close();
             sendAccessibilityEventIfQueryDone(token);
@@ -682,6 +760,16 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                 endMillis, attendeeResponse, isDialog, windowStyle, reminders);
         mEventId = eventId;
     }
+
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    public EventInfoFragment(Context context, long eventId, long startMillis, long endMillis,
+            int attendeeResponse, boolean isDialog, int windowStyle,
+            ArrayList<ReminderEntry> reminders,
+            Bundle extras) {
+        this(context, eventId, startMillis, endMillis, attendeeResponse, isDialog, windowStyle, reminders);
+        mIsIcsImport = extras.getBoolean(IcsConstants.EXTRA_IMPORT_ICS, false);
+    }
+    // End Motorola
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -849,6 +937,11 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             mWhichEvents = mEditResponseHelper.getWhichEvents();
         }
         mHandler = new QueryHandler(activity);
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        // Need initialize mIsTabletConfig here instead of in onCreateView, because
+        // onCreateOptionsMenu is called once setHasOptionsMenu is called.
+        mIsTabletConfig = Utils.getConfigBool(mActivity, R.bool.tablet_config);
+        // End Motorola
         if (!mIsDialog) {
             setHasOptionsMenu(true);
         }
@@ -921,6 +1014,12 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             mUri = ContentUris.withAppendedId(Events.CONTENT_URI, mEventId);
             mStartMillis = savedInstanceState.getLong(BUNDLE_KEY_START_MILLIS);
             mEndMillis = savedInstanceState.getLong(BUNDLE_KEY_END_MILLIS);
+
+            // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+            mSyncAccountType = savedInstanceState.getString(BUNDLE_KEY_SYNC_ACCOUNT_TYPE);
+            mAttendeeResponseFromIntent = savedInstanceState.getInt(BUNDLE_KEY_ATTENDEE_RESPONSE);
+            mIsIcsImport = savedInstanceState.getBoolean(BUNDLE_KEY_IS_ICS_IMPORT);
+            // End Motorola
         }
 
         mAnimateAlpha = ObjectAnimator.ofFloat(mScrollView, "Alpha", 0, 1);
@@ -958,7 +1057,9 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         mLoadingMsgView.postDelayed(mLoadingMsgAlphaUpdater, LOADING_MSG_DELAY);
 
         // start loading the data
-
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        mUri = IcalInfoUtils.decorateForScratch(mUri,mIsIcsImport);
+        // End Motorola
         mHandler.startQuery(TOKEN_QUERY_EVENT, null, mUri, EVENT_PROJECTION,
                 null, null, null);
 
@@ -992,7 +1093,12 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         // Hide Edit/Delete buttons if in full screen mode on a phone
         if (!mIsDialog && !mIsTabletConfig || mWindowStyle == EventInfoFragment.FULL_WINDOW_STYLE) {
             mView.findViewById(R.id.event_info_buttons_container).setVisibility(View.GONE);
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        } else if (mIsIcsImport) {
+           mView.findViewById(R.id.event_info_buttons_container).setVisibility(View.GONE);
+           mView.findViewById(R.id.ical_event_info_buttons_container).setVisibility(View.VISIBLE);
         }
+        // End Motorola
 
         // Create a listener for the email guests button
         emailAttendeesButton = (Button) mView.findViewById(R.id.email_attendees_button);
@@ -1007,6 +1113,12 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
 
         // Create a listener for the add reminder button
         View reminderAddButton = mView.findViewById(R.id.reminder_add);
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        if (mIsIcsImport) {
+            // Hide reminderAddButton for iCal-imported event
+            reminderAddButton.setVisibility(View.GONE);
+        } else {
+        // End Motorola
         View.OnClickListener addReminderOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1015,6 +1127,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             }
         };
         reminderAddButton.setOnClickListener(addReminderOnClickListener);
+        }//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
 
         // Set reminders variables
 
@@ -1203,6 +1316,11 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                 BUNDLE_KEY_REMINDER_MINUTES, reminderMinutes);
         outState.putIntegerArrayList(
                 BUNDLE_KEY_REMINDER_METHODS, reminderMethods);
+
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        outState.putString(BUNDLE_KEY_SYNC_ACCOUNT_TYPE, mSyncAccountType);
+        outState.putBoolean(BUNDLE_KEY_IS_ICS_IMPORT, mIsIcsImport);
+        // End Motorola
     }
 
     @Override
@@ -1210,9 +1328,16 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         super.onCreateOptionsMenu(menu, inflater);
         // Show color/edit/delete buttons only in non-dialog configuration
         if (!mIsDialog && !mIsTabletConfig || mWindowStyle == EventInfoFragment.FULL_WINDOW_STYLE) {
+            // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+            if (mIsIcsImport) {
+                inflater.inflate(R.menu.ical_event_info_title_bar, menu);
+                mMenu = menu;
+            } else {
+            // End Motorola
             inflater.inflate(R.menu.event_info_title_bar, menu);
             mMenu = menu;
             updateMenu();
+            }//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
         }
     }
 
@@ -1249,6 +1374,13 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         } else if (itemId == R.id.info_action_change_color) {
             showEventColorPickerDialog();
         }
+        //Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        else if (itemId == R.id.info_action_cancel) {
+                destroyICalView(false/*exit calendar app*/, true/*delete iCal event*/);
+        } else if (itemId == R.id.info_action_save) {
+                saveICalEventToLocal();
+        }
+        //End Motorola
         return super.onOptionsItemSelected(item);
     }
 
@@ -1285,7 +1417,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     @Override
     public void onStop() {
         Activity act = getActivity();
-        if (!mEventDeletionStarted && act != null && !act.isChangingConfigurations()) {
+        if (!mEventDeletionStarted && act != null && !act.isChangingConfigurations() && !mIsIcsImport) {//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247, add !mIsIcsImport
 
             boolean responseSaved = saveResponse();
             boolean eventColorSaved = saveEventColor();
@@ -1307,6 +1439,19 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         if (mAttendeesCursor != null) {
             mAttendeesCursor.close();
         }
+
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        if (mRemindersCursor != null) {
+            mRemindersCursor.close();
+        }
+        if (mExtendedPropertiesCursor != null) {
+            mExtendedPropertiesCursor.close();
+        }
+        if (mReplaceEventDialog != null) {
+            mReplaceEventDialog.dismiss();
+            mReplaceEventDialog = null;
+        }
+        // End Motorola
         super.onDestroy();
     }
 
@@ -1755,6 +1900,16 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             mHandler.startQuery(TOKEN_QUERY_VISIBLE_CALENDARS, null, Calendars.CONTENT_URI,
                     CALENDARS_PROJECTION, CALENDARS_VISIBLE_WHERE, new String[] {"1"}, null);
 
+            // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+            mSyncAccountType = mCalendarsCursor.getString(CALENDARS_INDEX_ACCOUNT_TYPE);
+            // start duplicate calendars query
+            String displayName = mCalendarsCursor.getString(CALENDARS_INDEX_DISPLAY_NAME);
+            mHandler.startQuery(TOKEN_QUERY_DUPLICATE_CALENDARS, null,
+                    IcalInfoUtils.decorateForScratch(Calendars.CONTENT_URI,mIsIcsImport),
+                    CALENDARS_PROJECTION, CALENDARS_DUPLICATE_NAME_WHERE,
+                    new String[] {displayName}, null);
+            // End Motorola
+
             mEventOrganizerEmail = mEventCursor.getString(EVENT_INDEX_ORGANIZER);
             mIsOrganizer = mCalendarOwnerAccount.equalsIgnoreCase(mEventOrganizerEmail);
 
@@ -1864,7 +2019,10 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             if (emailAttendeesButton != null) {
                 emailAttendeesButton.setText(R.string.email_guests_label);
             }
-        } else if (hasEmailableOrganizer()) {
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        } else if (hasEmailableOrganizer() && !mIsIcsImport &&
+                !CalendarContract.ACCOUNT_TYPE_LOCAL.equals(mSyncAccountType)) {
+        // End Motorola
             setVisibilityCommon(mView, R.id.email_attendees_container, View.VISIBLE);
             if (emailAttendeesButton != null) {
                 emailAttendeesButton.setText(R.string.email_organizer_label);
@@ -1964,6 +2122,20 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             }
             EventViewUtils.updateAddReminderButton(mView, mReminderViews, mMaxReminders);
             // TODO show unsupported reminder types in some fashion.
+            // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+            // Prevent reminders info from being edited for iCal-imported event
+            if (mIsIcsImport && mReminderViews != null) {
+                for (LinearLayout rv : mReminderViews) {
+                    View spinner = (View) rv.findViewById(R.id.reminder_minutes_value);
+                    spinner.setEnabled(false);
+                    spinner = (View) rv.findViewById(R.id.reminder_method_value);
+                    spinner.setEnabled(false);
+                    View reminderRemoveButton =
+                        (View) rv.findViewById(R.id.reminder_remove);
+                    reminderRemoveButton.setVisibility(View.GONE);
+                }
+            }
+            // End Motorola
         }
     }
 
@@ -1981,7 +2153,10 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
 
         // TODO Switch to EditEventHelper.canRespond when this class uses CalendarEventModel.
         if (!mCanModifyCalendar || (mHasAttendeeData && mIsOrganizer && mNumOfAttendees <= 1) ||
-                (mIsOrganizer && !mOwnerCanRespond)) {
+                // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+                (mIsOrganizer && !mOwnerCanRespond) || mIsIcsImport ||
+                    CalendarContract.ACCOUNT_TYPE_LOCAL.equals(mSyncAccountType)) {
+                // End Motorola
             setVisibilityCommon(view, R.id.response_container, View.GONE);
             return;
         }
@@ -2295,4 +2470,217 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         mCurrentColorKey = mDisplayColorKeyMap.get(color);
         mHeadlines.setBackgroundColor(color);
     }
+
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    /**
+     * initExtendedProperties will only be called when it's an iCal-imported event.
+     */
+    private void initExtendedProperties(View view, Cursor cursor) {
+        if (cursor.moveToFirst()) {
+            do {
+                String name = cursor.getString(EXTENDED_PROPERTIES_INDEX_NAME);
+                String value = cursor.getString(EXTENDED_PROPERTIES_INDEX_VALUE);
+                if (VCalConstants.UID.equals(name)) {
+                    mEventUID = value;
+                    break;
+                }
+            } while(cursor.moveToNext());
+        }
+
+        if (!mIsDialog && !mIsTabletConfig || mWindowStyle == EventInfoFragment.FULL_WINDOW_STYLE) {
+            if (mMenu != null) {
+                MenuItem cancel = mMenu.findItem(R.id.info_action_cancel);
+                MenuItem save = mMenu.findItem(R.id.info_action_save);
+                if (cancel != null) {
+                    cancel.setVisible(true);
+                    cancel.setEnabled(true);
+                }
+                if (save != null) {
+                    /*
+                    // Always hide "Save" menu item now
+                    save.setVisible(false);
+                     */
+                    if (TextUtils.isEmpty(mEventUID)) {
+                        // Hide "Save" function
+                        save.setVisible(false);
+                    } else {
+                        save.setVisible(true);
+                        save.setEnabled(true);
+                    }
+                }
+            }
+        } else {
+            Button b = (Button) mView.findViewById(R.id.cancel);
+            if (b != null) {
+                b.setVisibility(View.VISIBLE);
+                b.setEnabled(true);
+                b.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        destroyICalView(false/*exist calendar app*/, true/*delete iCal event*/);
+                    }
+                });
+            }
+
+            b = (Button) mView.findViewById(R.id.save);
+            if (b != null) {
+                /*
+                // Always hide "Save" button now
+                b.setVisibility(View.GONE);
+                 */
+                if (TextUtils.isEmpty(mEventUID)) {
+                    b.setVisibility(View.GONE);
+                } else {
+                    b.setVisibility(View.VISIBLE);
+                    b.setEnabled(true);
+                    b.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            saveICalEventToLocal();
+                        }
+                   });
+                }
+            }
+        }
+    }
+
+    /**
+     * Utility class used to store basic calendar account info.
+     */
+    public static class CalendarAccountInfo {
+        // Account _id
+        public final long mId;
+        // Account name
+        public final String mName;
+        // Account type
+        public final String mType;
+
+        public CalendarAccountInfo(long id, String name, String type) {
+            mId = id;
+            mName = name;
+            mType = type;
+        }
+    }
+
+    /**
+     * Get the local calendar account info.
+     *
+     * @return The found local account info or null if there's no local account.
+     */
+    private CalendarAccountInfo getLocalAccountInfo() {
+        ContentResolver resolver = mContext.getContentResolver();
+        String selection = Calendars.ACCOUNT_TYPE + "=?";
+        String[] selectionArgs = new String[] {CalendarContract.ACCOUNT_TYPE_LOCAL};
+        CalendarAccountInfo accountInfo = null;
+
+        Cursor c = resolver.query(Calendars.CONTENT_URI,
+                new String[]{Calendars._ID, Calendars.ACCOUNT_NAME, Calendars.ACCOUNT_TYPE},
+                selection, selectionArgs, null);
+        if (c != null) {
+            try {
+                if (c.moveToFirst()) {
+                    accountInfo = new CalendarAccountInfo(c.getLong(0), c.getString(1),
+                            c.getString(2));
+                }
+            } finally {
+                c.close();
+            }
+        }
+
+        return accountInfo;
+    }
+
+    /**
+     * Save the event which is being previewed into the given calendar
+     * account.  If there's already an event with the same uid in that
+     * account, that event will be replaced.
+     *
+     * @param accountInfo
+     *        The calendar account into which the event will be saved.
+     */
+    private void saveEventToDB(final CalendarAccountInfo accountInfo) {
+        final long eventId = IcalInfoUtils.getEventIdByUID(mContext,mEventUID, accountInfo.mId);
+        if (eventId == -1L) {
+            IcalInfoUtils.moveEventInDB(accountInfo,mEventCursor,mHandler,mEventId);
+            destroyICalView(true/*return to calendar home*/, false/*keep iCal event*/);
+        } else {
+            // Popup dialog to ask whether to overwrite current event.
+            DialogInterface.OnClickListener okButtonListener =
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int button) {
+                        IcalInfoUtils.replaceEventInDB(accountInfo, eventId,mEventId,mRemindersCursor,mHandler,mEventCursor,mStartMillis, mEndMillis);
+                        destroyICalView(true/*return to calendar home*/, true/*delete iCal event*/);
+                    }
+                };
+
+            if (mReplaceEventDialog != null) {
+                mReplaceEventDialog.dismiss();
+                mReplaceEventDialog = null;
+            }
+
+            mReplaceEventDialog = new AlertDialog.Builder(mContext)
+                .setTitle(R.string.replace_event_title)
+                .setIconAttribute(android.R.attr.alertDialogIcon)
+                .setMessage(R.string.replace_event_message)
+                .setPositiveButton(android.R.string.ok, okButtonListener)
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+        }
+    }
+
+    /**
+     * Save the iCal file which is being previewed into local account.
+     * If there's no local account, the dialog will be dismissed directly.
+     */
+    private void saveICalEventToLocal() {
+        CalendarAccountInfo accountInfo = getLocalAccountInfo();
+        if (accountInfo != null) {
+            saveEventToDB(accountInfo);
+        } else {
+            destroyICalView(false/*exit calendar app*/, true/*delete iCal event*/);
+        }
+    }
+
+    /**
+     * This method will destory the iCal preview window.
+     *
+     * @param returnToHome
+     *        Indicates whether we need return to calendar home
+     */
+    private void destroyICalView(boolean returnToCalHome, boolean deleteIcs) {
+        if (returnToCalHome) {
+            long start = mStartMillis;
+            long end = mEndMillis;
+            boolean isAllDay = false;
+            if ((mEventCursor != null) && mEventCursor.moveToFirst()) {
+                isAllDay = mEventCursor.getInt(EVENT_INDEX_ALL_DAY) != 0;
+            }
+            if (isAllDay) {
+                // For allday events we want to go to the day in the
+                // user's current tz
+                String tz = Utils.getTimeZone(mContext, null);
+                Time t = new Time(Time.TIMEZONE_UTC);
+                t.set(start);
+                t.timezone = tz;
+                start = t.toMillis(true);
+
+                t.timezone = Time.TIMEZONE_UTC;
+                t.set(end);
+                t.timezone = tz;
+                end = t.toMillis(true);
+            }
+            CalendarController.getInstance(mContext).launchViewEvent(-1, start, end, Attendees.ATTENDEE_STATUS_NONE);
+        }
+
+        if (mIsDialog && returnToCalHome) {
+            EventInfoFragment.this.dismiss();
+        } else {
+            mActivity.finish();
+        }
+
+        if (deleteIcs) {
+            mHandler.startDelete(mHandler.getNextToken(), null, mUri, null, null, 0);
+        }
+    }
+    // End Motorola
 }

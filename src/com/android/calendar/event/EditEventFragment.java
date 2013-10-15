@@ -34,6 +34,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
 import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Colors;
@@ -805,7 +806,11 @@ public class EditEventFragment extends Fragment implements EventHandler, OnColor
                     && mModel.normalizeReminders()
                     && mHelper.saveEvent(mModel, mOriginalModel, mModification)) {
                 int stringResource;
-                if (!mModel.mAttendeesList.isEmpty()) {
+                // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+                // Local calendar will not send out any invitation.
+                if (!mModel.mAttendeesList.isEmpty() &&
+                        !CalendarContract.ACCOUNT_TYPE_LOCAL.equals(mModel.mSyncAccountType)) {
+                // End Motorola
                     if (mModel.mUri != null) {
                         stringResource = R.string.saving_event_with_guest;
                     } else {

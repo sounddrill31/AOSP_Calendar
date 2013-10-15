@@ -55,6 +55,10 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.TimeZone;
 
+// Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+import android.provider.CalendarContract;
+// End Motorola
+
 public class EditEventHelper {
     private static final String TAG = "EditEventHelper";
 
@@ -146,6 +150,9 @@ public class EditEventHelper {
     protected static final int MODIFY_ALL = 3;
 
     protected static final int DAY_IN_SECONDS = 24 * 60 * 60;
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    protected static final long DAY_IN_MILLS = DAY_IN_SECONDS * 1000;
+    // End Motorola
 
     private final AsyncQueryService mService;
 
@@ -479,7 +486,11 @@ public class EditEventHelper {
 
         // TODO: is this the right test? this currently checks if this is
         // a new event or an existing event. or is this a paranoia check?
-        if (hasAttendeeData && (newEvent || uri != null)) {
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        // Never save/update Attendee data for local account
+        if (!CalendarContract.ACCOUNT_TYPE_LOCAL.equals(model.mSyncAccountType) &&
+                hasAttendeeData && (newEvent || uri != null)) {
+        // End Motorola
             String attendees = model.getAttendeesString();
             String originalAttendeesString;
             if (originalModel != null) {
@@ -757,6 +768,12 @@ public class EditEventHelper {
             // Subtract one second from the old begin time to get the new
             // "until" time.
             untilTime.set(endTimeMillis - 1000); // subtract one second (1000 millis)
+            // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+            // For Exchange Calendar, it needs to shift whole day so exchange server can recognize.
+            if ("com.android.exchange".equals(originalModel.mSyncAccountType)) {
+                untilTime.set(endTimeMillis - DAY_IN_MILLS);
+            }
+            // End Motorola
             if (origAllDay) {
                 untilTime.hour = 0;
                 untilTime.minute = 0;
@@ -1148,7 +1165,9 @@ public class EditEventHelper {
                     .getString(CALENDARS_INDEX_ALLOWED_ATTENDEE_TYPES);
             model.mCalendarAllowedAvailability = cursor
                     .getString(CALENDARS_INDEX_ALLOWED_AVAILABILITY);
-
+            //BEGIN Motorola, nmr874, 03/28/13, IKJBXLINE-1201 - legal fixes for exchange account.
+            model.mSyncAccountType = cursor.getString(CALENDARS_INDEX_ACCOUNT_TYPE);
+            // End IKJBXLINE-1201
             return true;
        }
        return false;
@@ -1179,6 +1198,13 @@ public class EditEventHelper {
         // paying attention to whether or not an attendee status was
         // included in the feed, but we're currently omitting those corner cases
         // for simplicity).
+
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        // If owner account is not in attendee list, can't response.
+        if (model.mOwnerAttendeeId == -1) {
+            return false;
+        }
+        // End Motorola
 
         if (!canModifyCalendar(model)) {
             return false;

@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.provider.CalendarContract;//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
 import android.provider.CalendarContract.Calendars;
 import android.text.TextUtils;
 import android.util.Log;
@@ -105,6 +106,12 @@ public class SelectSyncedCalendarsMultiAccountAdapter extends CursorTreeAdapter 
 
     private static String mSyncedText;
     private static String mNotSyncedText;
+
+    // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+    private final String mPhoneCalendarStr;
+    private final String mPhoneStorageStr;
+    private final String mNonSyncableStr;
+    // End Motorola
 
     // This is to keep track of whether or not multiple calendars have the same display name
     private static HashMap<String, Boolean> mIsDuplicateName = new HashMap<String, Boolean>();
@@ -249,6 +256,12 @@ public class SelectSyncedCalendarsMultiAccountAdapter extends CursorTreeAdapter 
 
         mColorViewTouchAreaIncrease = context.getResources()
                 .getDimensionPixelSize(R.dimen.color_view_touch_area_increase);
+
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        mPhoneCalendarStr = context.getString(R.string.phone_calendar);
+        mPhoneStorageStr = context.getString(R.string.phone_storage);
+        mNonSyncableStr = context.getString(R.string.non_syncable);
+        // End Motorola
     }
 
     public void startRefreshStopDelay() {
@@ -366,7 +379,14 @@ public class SelectSyncedCalendarsMultiAccountAdapter extends CursorTreeAdapter 
                     .append(Utils.CLOSE_EMAIL_MARKER)
                     .toString();
         }
-        setText(view, R.id.calendar, name);
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        boolean isLocalAccount = CalendarContract.ACCOUNT_TYPE_LOCAL.equals(accountType);
+        if (isLocalAccount) {
+            setText(view, R.id.calendar, mPhoneCalendarStr);
+        } else {
+            setText(view, R.id.calendar, name);
+        }
+        // End Motorola
 
         // First see if the user has already changed the state of this calendar
         Boolean sync = mCalendarChanges.get(id);
@@ -376,12 +396,20 @@ public class SelectSyncedCalendarsMultiAccountAdapter extends CursorTreeAdapter 
         }
 
         CheckBox button = (CheckBox) view.findViewById(R.id.sync);
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        if (isLocalAccount) {
+            button.setVisibility(View.GONE);
+            setText(view, R.id.status, mNonSyncableStr);
+            view.setEnabled(false);
+        } else {
+        // End Motorola
         button.setChecked(sync);
         setText(view, R.id.status, sync ? mSyncedText : mNotSyncedText);
 
         view.setTag(TAG_ID_CALENDAR_ID, id);
         view.setTag(TAG_ID_SYNC_CHECKBOX, button);
         view.setOnClickListener(this);
+        }//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
     }
 
     @Override
@@ -390,11 +418,18 @@ public class SelectSyncedCalendarsMultiAccountAdapter extends CursorTreeAdapter 
         int accountTypeColumn = cursor.getColumnIndexOrThrow(Calendars.ACCOUNT_TYPE);
         String account = cursor.getString(accountColumn);
         String accountType = cursor.getString(accountTypeColumn);
+        // Begin Motorola, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
+        if (CalendarContract.ACCOUNT_TYPE_LOCAL.equals(accountType)) {
+            setText(view, R.id.account, mPhoneCalendarStr);
+            setText(view, R.id.account_type, mPhoneStorageStr);
+        } else {
+        // End Motorola
         CharSequence accountLabel = getLabelForType(accountType);
         setText(view, R.id.account, account);
         if (accountLabel != null) {
             setText(view, R.id.account_type, accountLabel.toString());
         }
+        }//Motorola MODE, IKJB42MAIN-55 / Porting iCal feature for FEATURE-3247
     }
 
     @Override
