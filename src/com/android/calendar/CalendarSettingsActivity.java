@@ -33,6 +33,10 @@ import android.view.MenuItem;
 
 import java.util.List;
 
+// Begin iCal feature
+import android.database.Cursor;
+// End iCal feature
+
 public class CalendarSettingsActivity extends PreferenceActivity {
     private static final int CHECK_ACCOUNTS_DELAY = 3000;
     private Account[] mAccounts;
@@ -62,6 +66,9 @@ public class CalendarSettingsActivity extends PreferenceActivity {
             }
         }
         mAccounts = accounts;
+        // Begin iCal feature
+        buildLocalAccountHeaders(target);
+        // End iCal feature
         if (Utils.getTardis() + DateUtils.MINUTE_IN_MILLIS > System.currentTimeMillis()) {
             Header tardisHeader = new Header();
             tardisHeader.title = getString(R.string.preferences_experimental_category);
@@ -131,4 +138,37 @@ public class CalendarSettingsActivity extends PreferenceActivity {
     public void hideMenuButtons() {
         mHideMenuButtons = true;
     }
+
+    // Begin iCal feature
+    private void buildLocalAccountHeaders(List<Header> target) {
+        final String phoneCalStr = getString(R.string.phone_calendar);
+
+        Cursor c = getContentResolver().query(Calendars.CONTENT_URI,
+                new String[] {Calendars.ACCOUNT_NAME, Calendars.ACCOUNT_TYPE},
+                Calendars.ACCOUNT_TYPE + "=?"/* selection */,
+                new String[] {CalendarContract.ACCOUNT_TYPE_LOCAL}/*selection arg*/,
+                null);
+        if (c != null) {
+            try {
+                if (c.moveToFirst()) {
+                    do {
+                        Header accountHeader = new Header();
+                        // Begin Motorola
+                        accountHeader.title = phoneCalStr;
+                        // End Motorola
+                        accountHeader.fragment =
+                            "com.android.calendar.selectcalendars.SelectCalendarsSyncFragment";
+                        Bundle args = new Bundle();
+                        args.putString(Calendars.ACCOUNT_NAME, c.getString(0));
+                        args.putString(Calendars.ACCOUNT_TYPE, c.getString(1));
+                        accountHeader.fragmentArguments = args;
+                        target.add(1, accountHeader);
+                    } while (c.moveToNext());
+                }
+            } finally {
+                c.close();
+            }
+        }
+    }
+    // End iCal feature
 }

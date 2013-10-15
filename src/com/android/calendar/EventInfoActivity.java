@@ -32,6 +32,11 @@ import android.os.Handler;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Attendees;
 import android.util.Log;
+
+//Begin iCal feature
+import com.motorola.calendar.utils.IcalConfig;
+import com.android.calendar.ics.IcsConstants;
+//End iCal feature
 import android.widget.Toast;
 
 import com.android.calendar.CalendarEventModel.ReminderEntry;
@@ -47,6 +52,11 @@ public class EventInfoActivity extends Activity {
     private EventInfoFragment mInfoFragment;
     private long mStartMillis, mEndMillis;
     private long mEventId;
+    // Begin iCal feature
+    private boolean mIsIcsImport;
+    private boolean mIsDialog;
+    private int mAttendeeResponse;
+    // End iCal feature
 
     // Create an observer so that we can update the views whenever a
     // Calendar event changes.
@@ -76,6 +86,12 @@ public class EventInfoActivity extends Activity {
         boolean isDialog = false;
         ArrayList<ReminderEntry> reminders = null;
 
+        // Begin iCal feature
+        mIsIcsImport = false;
+        mIsDialog = false;
+        mAttendeeResponse = Attendees.ATTENDEE_STATUS_NONE;
+        // End iCal feature
+
         if (icicle != null) {
             mEventId = icicle.getLong(EventInfoFragment.BUNDLE_KEY_EVENT_ID);
             mStartMillis = icicle.getLong(EventInfoFragment.BUNDLE_KEY_START_MILLIS);
@@ -84,11 +100,20 @@ public class EventInfoActivity extends Activity {
             isDialog = icicle.getBoolean(EventInfoFragment.BUNDLE_KEY_IS_DIALOG);
 
             reminders = Utils.readRemindersFromBundle(icicle);
+
+            // Begin iCal feature
+            mIsIcsImport = icicle.getBoolean(EventInfoFragment.BUNDLE_KEY_IS_ICS_IMPORT);
+            mIsDialog = isDialog;
+            mAttendeeResponse = attendeeResponse;
+            // End iCal feature
         } else if (intent != null && Intent.ACTION_VIEW.equals(intent.getAction())) {
             mStartMillis = intent.getLongExtra(EXTRA_EVENT_BEGIN_TIME, 0);
             mEndMillis = intent.getLongExtra(EXTRA_EVENT_END_TIME, 0);
-            attendeeResponse = intent.getIntExtra(ATTENDEE_STATUS,
+            // Begin iCal feature
+            mAttendeeResponse = intent.getIntExtra(ATTENDEE_STATUS,
                     Attendees.ATTENDEE_STATUS_NONE);
+            mIsIcsImport = intent.getBooleanExtra(IcsConstants.EXTRA_IMPORT_ICS, false);
+            // End iCal feature
             Uri data = intent.getData();
             if (data != null) {
                 try {
@@ -123,18 +148,23 @@ public class EventInfoActivity extends Activity {
             Toast.makeText(this, R.string.event_not_found, Toast.LENGTH_SHORT).show();
             finish();
         }
-
+        // Begin iCal feature
+        if(mIsIcsImport && !IcalConfig.isICalFeatureEnabled()){
+            Toast.makeText(this, R.string.ical_not_supported, Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }else{
+        // End iCal feature
         // If we do not support showing full screen event info in this configuration,
         // close the activity and show the event in AllInOne.
         Resources res = getResources();
         if (!res.getBoolean(R.bool.agenda_show_event_info_full_screen)
                 && !res.getBoolean(R.bool.show_event_info_full_screen)) {
             CalendarController.getInstance(this)
-                    .launchViewEvent(mEventId, mStartMillis, mEndMillis, attendeeResponse);
+                    .launchViewEvent(mEventId, mStartMillis, mEndMillis, mAttendeeResponse);//iCal feature
             finish();
             return;
         }
-
         setContentView(R.layout.simple_frame_layout);
 
         // Get the fragment if exists
@@ -152,15 +182,20 @@ public class EventInfoActivity extends Activity {
         if (mInfoFragment == null) {
             FragmentManager fragmentManager = getFragmentManager();
             FragmentTransaction ft = fragmentManager.beginTransaction();
+            // Begin iCal feature
+            Bundle extras = new Bundle();
+            extras.putBoolean(IcsConstants.EXTRA_IMPORT_ICS, mIsIcsImport);
+            // End iCal feature
             mInfoFragment = new EventInfoFragment(this, mEventId, mStartMillis, mEndMillis,
-                    attendeeResponse, isDialog, (isDialog ?
+                    mAttendeeResponse, mIsDialog, (mIsDialog ?// iCal feature
                             EventInfoFragment.DIALOG_WINDOW_STYLE :
                                 EventInfoFragment.FULL_WINDOW_STYLE),
-                    reminders);
+                    reminders, extras);// iCal feature
             ft.replace(R.id.main_frame, mInfoFragment);
             ft.commit();
         }
     }
+    }// iCal feature
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -177,6 +212,14 @@ public class EventInfoActivity extends Activity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        // Begin iCal feature
+        outState.putLong(EventInfoFragment.BUNDLE_KEY_EVENT_ID, mEventId);
+        outState.putLong(EventInfoFragment.BUNDLE_KEY_START_MILLIS, mStartMillis);
+        outState.putLong(EventInfoFragment.BUNDLE_KEY_END_MILLIS, mEndMillis);
+        outState.putBoolean(EventInfoFragment.BUNDLE_KEY_IS_ICS_IMPORT, mIsIcsImport);
+        outState.putBoolean(EventInfoFragment.BUNDLE_KEY_IS_DIALOG, mIsDialog);
+        outState.putInt(EventInfoFragment.BUNDLE_KEY_ATTENDEE_RESPONSE, mAttendeeResponse);
+        // End iCal feature
     }
 
     @Override

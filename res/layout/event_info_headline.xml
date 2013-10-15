@@ -83,6 +83,36 @@
                 android:text="@string/delete_label"
                 android:textColor="@color/event_info_headline_color" />
         </LinearLayout>
+        <!-- Begin iCal feature -->
+        <!-- This button layout is reserved for iCal imported event -->
+        <LinearLayout
+            android:id="@+id/ical_event_info_buttons_container"
+            android:visibility="gone"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right">
+            <Button
+                android:id="@+id/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:enabled="false"
+                style="?android:attr/buttonBarButtonStyle"
+                android:textColor="@color/event_info_headline_color"
+                android:text="@string/discard_label" />
+            <Button
+                android:id="@+id/save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:visibility="visible"
+                android:enabled="false"
+                style="?android:attr/buttonBarButtonStyle"
+                android:textColor="@color/event_info_headline_color"
+                android:text="@string/ics_save_label" />
+        </LinearLayout>
+        <!-- End iCal feature -->
     </LinearLayout>
 
     <!-- WHEN -->

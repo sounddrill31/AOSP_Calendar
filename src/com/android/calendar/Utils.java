@@ -152,17 +152,17 @@ public class Utils {
     * Longitude: {-180 to 180}
     *
     * Or, in degrees, minutes, and seconds:
-    * Latitude: {-90 to 90}° {0 to 59}' {0 to 59}"
-    * Latitude: {-180 to 180}° {0 to 59}' {0 to 59}"
+    * Latitude: {-90 to 90}�� {0 to 59}' {0 to 59}"
+    * Latitude: {-180 to 180}�� {0 to 59}' {0 to 59}"
     * + or - degrees may also be represented with N or n, S or s for latitude, and with
     * E or e, W or w for longitude, where the direction may either precede or follow the value.
     *
     * Some examples of coordinates that will be accepted by the regex:
-    * 37.422081°, -122.084576°
+    * 37.422081��, -122.084576��
     * 37.422081,-122.084576
-    * +37°25'19.49", -122°5'4.47"
-    * 37°25'19.49"N, 122°5'4.47"W
-    * N 37° 25' 19.49",  W 122° 5' 4.47"
+    * +37��25'19.49", -122��5'4.47"
+    * 37��25'19.49"N, 122��5'4.47"W
+    * N 37�� 25' 19.49",  W 122�� 5' 4.47"
     **/
     private static final String COORD_DEGREES_LATITUDE =
             "([-+NnSs]" + "(\\s)*)?"
@@ -2099,5 +2099,4 @@ public class Utils {
 
         return reminders;
     }
-
 }

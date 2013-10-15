@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.provider.CalendarContract;//iCal feature
 import android.provider.CalendarContract.Calendars;
 import android.text.TextUtils;
 import android.util.Log;
@@ -105,6 +106,12 @@ public class SelectSyncedCalendarsMultiAccountAdapter extends CursorTreeAdapter 
 
     private static String mSyncedText;
     private static String mNotSyncedText;
+
+    // Begin iCal feature
+    private final String mPhoneCalendarStr;
+    private final String mPhoneStorageStr;
+    private final String mNonSyncableStr;
+    // End iCal feature
 
     // This is to keep track of whether or not multiple calendars have the same display name
     private static HashMap<String, Boolean> mIsDuplicateName = new HashMap<String, Boolean>();
@@ -249,6 +256,12 @@ public class SelectSyncedCalendarsMultiAccountAdapter extends CursorTreeAdapter 
 
         mColorViewTouchAreaIncrease = context.getResources()
                 .getDimensionPixelSize(R.dimen.color_view_touch_area_increase);
+
+        // Begin iCal feature
+        mPhoneCalendarStr = context.getString(R.string.phone_calendar);
+        mPhoneStorageStr = context.getString(R.string.phone_storage);
+        mNonSyncableStr = context.getString(R.string.non_syncable);
+        // End iCal feature
     }
 
     public void startRefreshStopDelay() {
@@ -366,7 +379,14 @@ public class SelectSyncedCalendarsMultiAccountAdapter extends CursorTreeAdapter 
                     .append(Utils.CLOSE_EMAIL_MARKER)
                     .toString();
         }
-        setText(view, R.id.calendar, name);
+        // Begin iCal feature
+        boolean isLocalAccount = CalendarContract.ACCOUNT_TYPE_LOCAL.equals(accountType);
+        if (isLocalAccount) {
+            setText(view, R.id.calendar, mPhoneCalendarStr);
+        } else {
+            setText(view, R.id.calendar, name);
+        }
+        // End iCal feature
 
         // First see if the user has already changed the state of this calendar
         Boolean sync = mCalendarChanges.get(id);
@@ -376,12 +396,20 @@ public class SelectSyncedCalendarsMultiAccountAdapter extends CursorTreeAdapter 
         }
 
         CheckBox button = (CheckBox) view.findViewById(R.id.sync);
+        // Begin iCal feature
+        if (isLocalAccount) {
+            button.setVisibility(View.GONE);
+            setText(view, R.id.status, mNonSyncableStr);
+            view.setEnabled(false);
+        } else {
+        // End iCal feature
         button.setChecked(sync);
         setText(view, R.id.status, sync ? mSyncedText : mNotSyncedText);
 
         view.setTag(TAG_ID_CALENDAR_ID, id);
         view.setTag(TAG_ID_SYNC_CHECKBOX, button);
         view.setOnClickListener(this);
+        }//iCal feature
     }
 
     @Override
@@ -390,11 +418,18 @@ public class SelectSyncedCalendarsMultiAccountAdapter extends CursorTreeAdapter 
         int accountTypeColumn = cursor.getColumnIndexOrThrow(Calendars.ACCOUNT_TYPE);
         String account = cursor.getString(accountColumn);
         String accountType = cursor.getString(accountTypeColumn);
+        // Begin iCal feature
+        if (CalendarContract.ACCOUNT_TYPE_LOCAL.equals(accountType)) {
+            setText(view, R.id.account, mPhoneCalendarStr);
+            setText(view, R.id.account_type, mPhoneStorageStr);
+        } else {
+        // End iCal feature
         CharSequence accountLabel = getLabelForType(accountType);
         setText(view, R.id.account, account);
         if (accountLabel != null) {
             setText(view, R.id.account_type, accountLabel.toString());
         }
+        }//iCal feature
     }
 
     @Override

@@ -23,6 +23,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;//iCal feature
 import android.provider.CalendarContract.Calendars;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,8 +45,10 @@ public class SelectVisibleCalendarsFragment extends Fragment
 
     private static final String TAG = "Calendar";
     private static final String IS_PRIMARY = "\"primary\"";
-    private static final String SELECTION = Calendars.SYNC_EVENTS + "=?";
-    private static final String[] SELECTION_ARGS = new String[] {"1"};
+    // Begin iCal feature
+    private static final String SELECTION = Calendars.SYNC_EVENTS + "=? OR " + Calendars.ACCOUNT_TYPE + "=?";
+    private static final String[] SELECTION_ARGS = new String[] {"1", CalendarContract.ACCOUNT_TYPE_LOCAL};
+    // End iCal feature
 
     private static final String[] PROJECTION = new String[] {
         Calendars._ID,
