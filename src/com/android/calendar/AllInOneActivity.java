@@ -69,6 +69,7 @@ import com.android.calendar.CalendarController.EventInfo;
 import com.android.calendar.CalendarController.EventType;
 import com.android.calendar.CalendarController.ViewType;
 import com.android.calendar.agenda.AgendaFragment;
+import com.android.calendar.ics.IcsConstants;//iCal feature
 import com.android.calendar.month.MonthByWeekFragment;
 import com.android.calendar.selectcalendars.SelectVisibleCalendarsFragment;
 
@@ -138,6 +139,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     private long mIntentEventEndMillis = -1;
     private int mIntentAttendeeResponse = Attendees.ATTENDEE_STATUS_NONE;
     private boolean mIntentAllDay = false;
+    // Begin iCal feature
+    private boolean mIsIcsImport = false;
+    // End iCal feature
 
     // Action bar and Navigation bar (left side of Action bar)
     private ActionBar mActionBar;
@@ -449,6 +453,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                             ATTENDEE_STATUS, Attendees.ATTENDEE_STATUS_NONE);
                         mIntentAllDay = intent.getBooleanExtra(EXTRA_EVENT_ALL_DAY, false);
                         timeMillis = mIntentEventStartMillis;
+                        // Begin iCal feature
+                        mIsIcsImport = intent.getBooleanExtra(IcsConstants.EXTRA_IMPORT_ICS, false);
+                        // End iCal feature
                     }
                 } catch (NumberFormatException e) {
                     // Ignore if mViewEventId can't be parsed
@@ -539,10 +546,15 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             if (currentMillis > mIntentEventStartMillis && currentMillis < mIntentEventEndMillis) {
                 selectedTime = currentMillis;
             }
+            // Begin iCal feature
+            Bundle extras = new Bundle();
+            extras.putBoolean(IcsConstants.EXTRA_IMPORT_ICS, mIsIcsImport);
             mController.sendEventRelatedEventWithExtra(this, EventType.VIEW_EVENT, mViewEventId,
                     mIntentEventStartMillis, mIntentEventEndMillis, -1, -1,
                     EventInfo.buildViewExtraLong(mIntentAttendeeResponse,mIntentAllDay),
-                    selectedTime);
+                    selectedTime, extras);
+            mIsIcsImport = false;
+            // End iCal feature
             mViewEventId = -1;
             mIntentEventStartMillis = -1;
             mIntentEventEndMillis = -1;
@@ -1149,7 +1161,11 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             // do not create the event info fragment here, it will be created by the Agenda
             // fragment
 
-            if (mCurrentView == ViewType.AGENDA && mShowEventDetailsWithAgenda) {
+            // Begin iCal feature
+            // For iCal-imported event, we always need show the preview screen.
+            if (!event.extras.getBoolean(IcsConstants.EXTRA_IMPORT_ICS, false)
+                    && mCurrentView == ViewType.AGENDA && mShowEventDetailsWithAgenda) {
+            // End iCal feature
                 if (event.startTime != null && event.endTime != null) {
                     // Event is all day , adjust the goto time to local time
                     if (event.isAllDay()) {
@@ -1181,11 +1197,15 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     Uri eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, event.id);
                     intent.setData(eventUri);
                     intent.setClass(this, EventInfoActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
-                            Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    // Begin iCal feature
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    // End iCal feature
                     intent.putExtra(EXTRA_EVENT_BEGIN_TIME, event.startTime.toMillis(false));
                     intent.putExtra(EXTRA_EVENT_END_TIME, event.endTime.toMillis(false));
                     intent.putExtra(ATTENDEE_STATUS, response);
+                    // Begin iCal feature
+                    intent.putExtra(IcsConstants.EXTRA_IMPORT_ICS, event.extras.getBoolean(IcsConstants.EXTRA_IMPORT_ICS, false));
+                    // Begin iCal feature
                     startActivity(intent);
                 } else {
                     // start event info as a dialog
@@ -1193,7 +1213,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                             event.id, event.startTime.toMillis(false),
                             event.endTime.toMillis(false), response, true,
                             EventInfoFragment.DIALOG_WINDOW_STYLE,
-                            null /* No reminders to explicitly pass in. */);
+                            null /* No reminders to explicitly pass in. */, event.extras);//iCal feature
                     fragment.setDialogParams(event.x, event.y, mActionBar.getHeight());
                     FragmentManager fm = getFragmentManager();
                     FragmentTransaction ft = fm.beginTransaction();

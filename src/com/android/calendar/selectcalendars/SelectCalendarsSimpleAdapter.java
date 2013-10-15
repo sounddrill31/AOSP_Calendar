@@ -23,6 +23,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.provider.CalendarContract;//iCal feature
 import android.provider.CalendarContract.Calendars;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -83,6 +84,11 @@ public class SelectCalendarsSimpleAdapter extends BaseAdapter implements ListAda
 
     private CalendarColorCache mCache;
 
+    // Begin iCal feature
+    private final String mPhoneCalendarStr;
+    private final String mPhoneStorageStr;
+    // End iCal feature
+
     private class CalendarRow {
         long id;
         String displayName;
@@ -119,6 +125,11 @@ public class SelectCalendarsSimpleAdapter extends BaseAdapter implements ListAda
         mIsTablet = Utils.getConfigBool(context, R.bool.tablet_config);
         mColorViewTouchAreaIncrease = context.getResources()
                 .getDimensionPixelSize(R.dimen.color_view_touch_area_increase);
+
+        // Begin iCal feature
+        mPhoneCalendarStr = context.getResources().getString(R.string.phone_calendar);
+        mPhoneStorageStr = context.getResources().getString(R.string.phone_storage);
+        // End iCal feature
     }
 
     private static class TabletCalendarItemBackgrounds {
@@ -218,6 +229,9 @@ public class SelectCalendarsSimpleAdapter extends BaseAdapter implements ListAda
         if (position >= mRowCount) {
             return null;
         }
+        // Begin iCal feature
+        String accountType = mData[position].accountType;
+        // End iCal feature
         String name = mData[position].displayName;
         boolean selected = mData[position].selected;
 
@@ -245,7 +259,14 @@ public class SelectCalendarsSimpleAdapter extends BaseAdapter implements ListAda
         }
 
         TextView calendarName = (TextView) view.findViewById(R.id.calendar);
-        calendarName.setText(name);
+        // Begin iCal feature
+        boolean isLocalAccount = CalendarContract.ACCOUNT_TYPE_LOCAL.equals(accountType);
+        if (isLocalAccount) {
+            calendarName.setText(mPhoneCalendarStr);
+        } else {
+            calendarName.setText(name);
+        }
+        // End iCal feature
 
         View colorView = view.findViewById(R.id.color);
         colorView.setBackgroundColor(color);
@@ -296,7 +317,13 @@ public class SelectCalendarsSimpleAdapter extends BaseAdapter implements ListAda
                 } else {
                     secondaryColor = mColorCalendarSecondaryHidden;
                 }
-                secondaryText.setText(mData[position].ownerAccount);
+                // Begin iCal feature
+                if (isLocalAccount) {
+                    secondaryText.setText(mPhoneStorageStr);
+                } else {
+                    secondaryText.setText(mData[position].ownerAccount);
+                }
+                // End iCal feature
                 secondaryText.setTextColor(secondaryColor);
                 secondaryText.setVisibility(View.VISIBLE);
                 layoutParam.height = LayoutParams.WRAP_CONTENT;

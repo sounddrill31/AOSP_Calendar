@@ -35,7 +35,23 @@ LOCAL_SDK_VERSION := current
 
 LOCAL_RESOURCE_DIR := $(addprefix $(LOCAL_PATH)/, $(res_dirs))
 
+# Begin iCal feature
+ifeq ($(PRODUCT_REQUIRES_ICAL_CALENDAR_FEATURE),true)
+   LOCAL_SRC_FILES += enable/src/com/motorola/calendar/utils/IcalConfig.java
+else
+   LOCAL_SRC_FILES += disable/src/com/motorola/calendar/utils/IcalConfig.java
+endif
+# End iCal feature
+
 LOCAL_PACKAGE_NAME := Calendar
+
+# Begin iCal feature
+LOCAL_JAVA_LIBRARIES := \
+    com.motorola.calendarcommon
+
+LOCAL_REQUIRED_MODULES := \
+    com.motorola.calendarcommon
+# End iCal feature
 
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags \
                              ../../../frameworks/opt/datetimepicker/proguard.flags

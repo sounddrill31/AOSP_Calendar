@@ -122,8 +122,10 @@ public class SelectCalendarsSyncFragment extends ListFragment
     @Override
     public void onResume() {
         super.onResume();
-        if (!ContentResolver.getMasterSyncAutomatically()
-                || !ContentResolver.getSyncAutomatically(mAccount, CalendarContract.AUTHORITY)) {
+        // Begin iCal feature
+        if (!isLocalAccount() && (!ContentResolver.getMasterSyncAutomatically()
+                || !ContentResolver.getSyncAutomatically(mAccount, CalendarContract.AUTHORITY))) {
+        // End iCal feature
             Resources res = getActivity().getResources();
             mSyncStatus.setText(res.getString(R.string.acct_not_synced));
             mSyncStatus.setVisibility(View.VISIBLE);
@@ -199,7 +201,13 @@ public class SelectCalendarsSyncFragment extends ListFragment
         } else {
             adapter.changeCursor(data);
         }
-        getListView().setOnItemClickListener(adapter);
+        // Begin iCal feature
+        if (isLocalAccount()) {
+            getListView().setEnabled(false);
+        } else {
+            getListView().setOnItemClickListener(adapter);
+        }
+        // End iCal feature
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -214,4 +222,10 @@ public class SelectCalendarsSyncFragment extends ListFragment
         intent.setAction("android.settings.SYNC_SETTINGS");
         getActivity().startActivity(intent);
     }
+
+    // Begin iCal feature
+    private boolean isLocalAccount() {
+        return CalendarContract.ACCOUNT_TYPE_LOCAL.equals(mAccount.type);
+    }
+    // End iCal feature
 }
