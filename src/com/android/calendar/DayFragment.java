@@ -32,6 +32,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
+import android.util.Log;
 
 /**
  * This is the base class for Day and Week Activities.
@@ -171,6 +172,7 @@ public class DayFragment extends Fragment implements CalendarController.EventHan
     }
 
     private void goTo(Time goToTime, boolean ignoreTime, boolean animateToday) {
+          Log.d("In DayFragment:", "line#: 174");
         if (mViewSwitcher == null) {
             // The view hasn't been set yet. Just save the time and use it later.
             mSelectedDay.set(goToTime);
@@ -183,9 +185,11 @@ public class DayFragment extends Fragment implements CalendarController.EventHan
         int diff = currentView.compareToVisibleTimeRange(goToTime);
 
         if (diff == 0) {
+          Log.d("In DayFragment:", "line#: 186");
             // In visible range. No need to switch view
             currentView.setSelected(goToTime, ignoreTime, animateToday);
         } else {
+          Log.d("In DayFragment:", "line#: 191");
             // Figure out which way to animate
             if (diff > 0) {
                 mViewSwitcher.setInAnimation(mInAnimationForward);

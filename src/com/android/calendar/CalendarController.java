@@ -24,8 +24,6 @@ import static android.provider.CalendarContract.Attendees.ATTENDEE_STATUS;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
-import android.app.SearchManager;
-import android.app.SearchableInfo;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -41,7 +39,6 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.android.calendar.event.EditEventActivity;
-import com.android.calendar.selectcalendars.SelectVisibleCalendarsActivity;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
@@ -580,45 +577,6 @@ public class CalendarController {
                 }
             }
         }
-
-        if (!handled) {
-            // Launch Settings
-            if (event.eventType == EventType.LAUNCH_SETTINGS) {
-                launchSettings();
-                return;
-            }
-
-            // Launch Calendar Visible Selector
-            if (event.eventType == EventType.LAUNCH_SELECT_VISIBLE_CALENDARS) {
-                launchSelectVisibleCalendars();
-                return;
-            }
-
-            // Create/View/Edit/Delete Event
-            long endTime = (event.endTime == null) ? -1 : event.endTime.toMillis(false);
-            if (event.eventType == EventType.CREATE_EVENT) {
-                launchCreateEvent(event.startTime.toMillis(false), endTime,
-                        event.extraLong == EXTRA_CREATE_ALL_DAY, event.eventTitle,
-                        event.calendarId);
-                return;
-            } else if (event.eventType == EventType.VIEW_EVENT) {
-                launchViewEvent(event.id, event.startTime.toMillis(false), endTime,
-                        event.getResponse());
-                return;
-            } else if (event.eventType == EventType.EDIT_EVENT) {
-                launchEditEvent(event.id, event.startTime.toMillis(false), endTime, true);
-                return;
-            } else if (event.eventType == EventType.VIEW_EVENT_DETAILS) {
-                launchEditEvent(event.id, event.startTime.toMillis(false), endTime, false);
-                return;
-            } else if (event.eventType == EventType.DELETE_EVENT) {
-                launchDeleteEvent(event.id, event.startTime.toMillis(false), endTime);
-                return;
-            } else if (event.eventType == EventType.SEARCH) {
-                launchSearch(event.id, event.query, event.componentName);
-                return;
-            }
-        }
     }
 
     /**
@@ -719,40 +677,6 @@ public class CalendarController {
         return mPreviousViewType;
     }
 
-    private void launchSelectVisibleCalendars() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setClass(mContext, SelectVisibleCalendarsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        mContext.startActivity(intent);
-    }
-
-    private void launchSettings() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setClass(mContext, CalendarSettingsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        mContext.startActivity(intent);
-    }
-
-    private void launchCreateEvent(long startMillis, long endMillis, boolean allDayEvent,
-            String title, long calendarId) {
-        Intent intent = generateCreateEventIntent(startMillis, endMillis, allDayEvent, title,
-            calendarId);
-        mEventId = -1;
-        mContext.startActivity(intent);
-    }
-
-    public Intent generateCreateEventIntent(long startMillis, long endMillis,
-        boolean allDayEvent, String title, long calendarId) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setClass(mContext, EditEventActivity.class);
-        intent.putExtra(EXTRA_EVENT_BEGIN_TIME, startMillis);
-        intent.putExtra(EXTRA_EVENT_END_TIME, endMillis);
-        intent.putExtra(EXTRA_EVENT_ALL_DAY, allDayEvent);
-        intent.putExtra(Events.CALENDAR_ID, calendarId);
-        intent.putExtra(Events.TITLE, title);
-        return intent;
-    }
-
     public void launchViewEvent(long eventId, long startMillis, long endMillis, int response) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
@@ -762,46 +686,6 @@ public class CalendarController {
         intent.putExtra(EXTRA_EVENT_END_TIME, endMillis);
         intent.putExtra(ATTENDEE_STATUS, response);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        mContext.startActivity(intent);
-    }
-
-    private void launchEditEvent(long eventId, long startMillis, long endMillis, boolean edit) {
-        Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
-        Intent intent = new Intent(Intent.ACTION_EDIT, uri);
-        intent.putExtra(EXTRA_EVENT_BEGIN_TIME, startMillis);
-        intent.putExtra(EXTRA_EVENT_END_TIME, endMillis);
-        intent.setClass(mContext, EditEventActivity.class);
-        intent.putExtra(EVENT_EDIT_ON_LAUNCH, edit);
-        mEventId = eventId;
-        mContext.startActivity(intent);
-    }
-
-//    private void launchAlerts() {
-//        Intent intent = new Intent();
-//        intent.setClass(mContext, AlertActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        mContext.startActivity(intent);
-//    }
-
-    private void launchDeleteEvent(long eventId, long startMillis, long endMillis) {
-        launchDeleteEventAndFinish(null, eventId, startMillis, endMillis, -1);
-    }
-
-    private void launchDeleteEventAndFinish(Activity parentActivity, long eventId, long startMillis,
-            long endMillis, int deleteWhich) {
-        DeleteEventHelper deleteEventHelper = new DeleteEventHelper(mContext, parentActivity,
-                parentActivity != null /* exit when done */);
-        deleteEventHelper.delete(startMillis, endMillis, eventId, deleteWhich);
-    }
-
-    private void launchSearch(long eventId, String query, ComponentName componentName) {
-        final SearchManager searchManager =
-                (SearchManager)mContext.getSystemService(Context.SEARCH_SERVICE);
-        final SearchableInfo searchableInfo = searchManager.getSearchableInfo(componentName);
-        final Intent intent = new Intent(Intent.ACTION_SEARCH);
-        intent.putExtra(SearchManager.QUERY, query);
-        intent.setComponent(searchableInfo.getSearchActivity());
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         mContext.startActivity(intent);
     }
 

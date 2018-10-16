@@ -254,13 +254,6 @@ public class Utils {
     }
 
     /**
-     * Gets the intent action for telling the widget to update.
-     */
-    public static String getSearchAuthority(Context context) {
-        return context.getPackageName() + ".CalendarRecentSuggestionsProvider";
-    }
-
-    /**
      * Writes a new home time zone to the db. Updates the home time zone in the
      * db asynchronously and updates the local cache. Sending a time zone of
      * **tbd** will cause it to be set to the device's time zone. null or empty
