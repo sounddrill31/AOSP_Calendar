@@ -98,10 +98,8 @@ import com.android.calendar.CalendarController.EventType;
 import com.android.calendar.CalendarEventModel.Attendee;
 import com.android.calendar.CalendarEventModel.ReminderEntry;
 import com.android.calendar.alerts.QuickResponseActivity;
-import com.android.calendar.event.AttendeesView;
 import com.android.calendar.event.EditEventActivity;
 import com.android.calendar.event.EditEventHelper;
-import com.android.calendar.event.EventColorPickerDialog;
 import com.android.calendar.event.EventViewUtils;
 import com.android.calendarcommon2.DateException;
 import com.android.calendarcommon2.Duration;
@@ -115,7 +113,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class EventInfoFragment extends DialogFragment implements OnCheckedChangeListener,
-        CalendarController.EventHandler, OnClickListener, DeleteEventHelper.DeleteNotifyListener,
+        CalendarController.EventHandler, OnClickListener,
         OnColorSelectedListener {
 
     public static final boolean DEBUG = false;
@@ -332,7 +330,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     private int mNumOfAttendees;
     private EditResponseHelper mEditResponseHelper;
     private boolean mDeleteDialogVisible = false;
-    private DeleteEventHelper mDeleteHelper;
 
     private int mOriginalAttendeeResponse;
     private int mAttendeeResponseFromIntent = Attendees.ATTENDEE_STATUS_NONE;
@@ -351,9 +348,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     private TextView mTitle;
     private TextView mWhenDateTime;
     private TextView mWhere;
-    private ExpandableTextView mDesc;
-    private AttendeesView mLongAttendees;
-    private Button emailAttendeesButton;
     private Menu mMenu = null;
     private View mHeadlines;
     private ScrollView mScrollView;
@@ -362,7 +356,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     private ObjectAnimator mAnimateAlpha;
     private long mLoadingMsgStartTime;
 
-    private EventColorPickerDialog mColorPickerDialog;
     private SparseIntArray mDisplayColorKeyMap = new SparseIntArray();
     private int[] mColors;
     private int mOriginalColor = -1;
@@ -716,11 +709,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
 
         final Activity activity = getActivity();
         mContext = activity;
-        mColorPickerDialog = (EventColorPickerDialog) activity.getFragmentManager()
-                .findFragmentByTag(COLOR_PICKER_DIALOG_TAG);
-        if (mColorPickerDialog != null) {
-            mColorPickerDialog.setOnColorSelectedListener(this);
-        }
     }
 
     private void applyDialogParams() {
@@ -909,9 +897,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         mTitle = (TextView) mView.findViewById(R.id.title);
         mWhenDateTime = (TextView) mView.findViewById(R.id.when_datetime);
         mWhere = (TextView) mView.findViewById(R.id.where);
-        mDesc = (ExpandableTextView) mView.findViewById(R.id.description);
         mHeadlines = mView.findViewById(R.id.event_info_headline);
-        mLongAttendees = (AttendeesView) mView.findViewById(R.id.long_attendee_list);
 
         mResponseRadioGroup = (RadioGroup) mView.findViewById(R.id.response_value);
 
@@ -966,15 +952,10 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         b.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+              Log.d("In EventInfoFragment:", "line#: 969");
                 if (!mCanModifyCalendar) {
                     return;
                 }
-                mDeleteHelper =
-                        new DeleteEventHelper(mContext, mActivity, !mIsDialog && !mIsTabletConfig /* exitWhenDone */);
-                mDeleteHelper.setDeleteNotificationListener(EventInfoFragment.this);
-                mDeleteHelper.setOnDismissListener(createDeleteOnDismissListener());
-                mDeleteDialogVisible = true;
-                mDeleteHelper.delete(mStartMillis, mEndMillis, mEventId, -1, onDeleteRunnable);
             }
         });
 
@@ -982,6 +963,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         b.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+              Log.d("In EventInfoFragment:", "line#: 986");
                 if (!mCanModifyCalendar) {
                     return;
                 }
@@ -994,22 +976,12 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             mView.findViewById(R.id.event_info_buttons_container).setVisibility(View.GONE);
         }
 
-        // Create a listener for the email guests button
-        emailAttendeesButton = (Button) mView.findViewById(R.id.email_attendees_button);
-        if (emailAttendeesButton != null) {
-            emailAttendeesButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    emailAttendees();
-                }
-            });
-        }
-
         // Create a listener for the add reminder button
         View reminderAddButton = mView.findViewById(R.id.reminder_add);
         View.OnClickListener addReminderOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+              Log.d("In EventInfoFragment:", "line#: 1015");
                 addReminder();
                 mUserModifiedReminders = true;
             }
@@ -1239,13 +1211,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         } else if (itemId == R.id.info_action_edit) {
             doEdit();
             mActivity.finish();
-        } else if (itemId == R.id.info_action_delete) {
-            mDeleteHelper =
-                    new DeleteEventHelper(mActivity, mActivity, true /* exitWhenDone */);
-            mDeleteHelper.setDeleteNotificationListener(EventInfoFragment.this);
-            mDeleteHelper.setOnDismissListener(createDeleteOnDismissListener());
-            mDeleteDialogVisible = true;
-            mDeleteHelper.delete(mStartMillis, mEndMillis, mEventId, -1, onDeleteRunnable);
         } else if (itemId == R.id.info_action_change_color) {
             showEventColorPickerDialog();
         }
@@ -1253,16 +1218,8 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     }
 
     private void showEventColorPickerDialog() {
-        if (mColorPickerDialog == null) {
-            mColorPickerDialog = EventColorPickerDialog.newInstance(mColors, mCurrentColor,
-                    mCalendarColor, mIsTabletConfig);
-            mColorPickerDialog.setOnColorSelectedListener(this);
-        }
         final FragmentManager fragmentManager = getFragmentManager();
         fragmentManager.executePendingTransactions();
-        if (!mColorPickerDialog.isAdded()) {
-            mColorPickerDialog.show(fragmentManager, COLOR_PICKER_DIALOG_TAG);
-        }
     }
 
     private boolean saveEventColor() {
@@ -1289,7 +1246,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
 
             boolean responseSaved = saveResponse();
             boolean eventColorSaved = saveEventColor();
-            if (saveReminders() || responseSaved || eventColorSaved) {
+            if (responseSaved || eventColorSaved) {
                 Toast.makeText(getActivity(), R.string.saving_event, Toast.LENGTH_SHORT).show();
             }
         }
@@ -1557,8 +1514,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                 date.timezone = Time.TIMEZONE_UTC;
             }
             eventRecurrence.setStartDate(date);
-            repeatString = EventRecurrenceFormatter.getRepeatString(mContext, resources,
-                    eventRecurrence, true);
         }
         if (repeatString == null) {
             view.findViewById(R.id.when_repeat).setVisibility(View.GONE);
@@ -1606,11 +1561,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                     }
                 });
             }
-        }
-
-        // Description
-        if (description != null && description.length() != 0) {
-            mDesc.setText(description);
         }
 
         // Launch Custom App
@@ -1674,6 +1624,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             launchButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                  Log.d("In EventInfoFragment:", "line#: 1681");
                     try {
                         startActivityForResult(intent, 0);
                     } catch (ActivityNotFoundException e) {
@@ -1704,11 +1655,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         event.setPackageName(getActivity().getPackageName());
         List<CharSequence> text = event.getText();
 
-        addFieldToAccessibilityEvent(text, mTitle, null);
-        addFieldToAccessibilityEvent(text, mWhenDateTime, null);
-        addFieldToAccessibilityEvent(text, mWhere, null);
-        addFieldToAccessibilityEvent(text, null, mDesc);
-
         if (mResponseRadioGroup.getVisibility() == View.VISIBLE) {
             int id = mResponseRadioGroup.getCheckedRadioButtonId();
             if (id != View.NO_ID) {
@@ -1719,26 +1665,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         }
 
         am.sendAccessibilityEvent(event);
-    }
-
-    private void addFieldToAccessibilityEvent(List<CharSequence> text, TextView tv,
-            ExpandableTextView etv) {
-        CharSequence cs;
-        if (tv != null) {
-            cs = tv.getText();
-        } else if (etv != null) {
-            cs = etv.getText();
-        } else {
-            return;
-        }
-
-        if (!TextUtils.isEmpty(cs)) {
-            cs = cs.toString().trim();
-            if (cs.length() > 0) {
-                text.add(cs);
-                text.add(PERIOD_SPACE);
-            }
-        }
     }
 
     private void updateCalendar(View view) {
@@ -1784,6 +1710,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
                 b.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                      Log.d("In EventInfoFragment:", "line#: 1792");
                         doEdit();
                         // For dialogs, just close the fragment
                         // For full screen, close activity on phone, leave it for tablet
@@ -1846,58 +1773,12 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     }
 
     private void updateAttendees(View view) {
-        if (mAcceptedAttendees.size() + mDeclinedAttendees.size() +
-                mTentativeAttendees.size() + mNoResponseAttendees.size() > 0) {
-            mLongAttendees.clearAttendees();
-            (mLongAttendees).addAttendees(mAcceptedAttendees);
-            (mLongAttendees).addAttendees(mDeclinedAttendees);
-            (mLongAttendees).addAttendees(mTentativeAttendees);
-            (mLongAttendees).addAttendees(mNoResponseAttendees);
-            mLongAttendees.setEnabled(false);
-            mLongAttendees.setVisibility(View.VISIBLE);
-        } else {
-            mLongAttendees.setVisibility(View.GONE);
-        }
-
-        if (hasEmailableAttendees()) {
-            setVisibilityCommon(mView, R.id.email_attendees_container, View.VISIBLE);
-            if (emailAttendeesButton != null) {
-                emailAttendeesButton.setText(R.string.email_guests_label);
-            }
-        } else if (hasEmailableOrganizer()) {
-            setVisibilityCommon(mView, R.id.email_attendees_container, View.VISIBLE);
-            if (emailAttendeesButton != null) {
-                emailAttendeesButton.setText(R.string.email_organizer_label);
-            }
-        } else {
-            setVisibilityCommon(mView, R.id.email_attendees_container, View.GONE);
-        }
     }
 
     /**
      * Returns true if there is at least 1 attendee that is not the viewer.
      */
     private boolean hasEmailableAttendees() {
-        for (Attendee attendee : mAcceptedAttendees) {
-            if (Utils.isEmailableFrom(attendee.mEmail, mSyncAccountName)) {
-                return true;
-            }
-        }
-        for (Attendee attendee : mTentativeAttendees) {
-            if (Utils.isEmailableFrom(attendee.mEmail, mSyncAccountName)) {
-                return true;
-            }
-        }
-        for (Attendee attendee : mNoResponseAttendees) {
-            if (Utils.isEmailableFrom(attendee.mEmail, mSyncAccountName)) {
-                return true;
-            }
-        }
-        for (Attendee attendee : mDeclinedAttendees) {
-            if (Utils.isEmailableFrom(attendee.mEmail, mSyncAccountName)) {
-                return true;
-            }
-        }
         return false;
     }
 
@@ -2061,13 +1942,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         mIsPaused = true;
         mHandler.removeCallbacks(onDeleteRunnable);
         super.onPause();
-        // Remove event deletion alert box since it is being rebuild in the OnResume
-        // This is done to get the same behavior on OnResume since the AlertDialog is gone on
-        // rotation but not if you press the HOME key
-        if (mDeleteDialogVisible && mDeleteHelper != null) {
-            mDeleteHelper.dismissAlertDialog();
-            mDeleteHelper = null;
-        }
         if (mTentativeUserSetResponse != Attendees.ATTENDEE_STATUS_NONE
                 && mEditResponseHelper != null) {
             mEditResponseHelper.dismissAlertDialog();
@@ -2085,14 +1959,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         if (mDismissOnResume) {
             mHandler.post(onDeleteRunnable);
         }
-        // Display the "delete confirmation" or "edit response helper" dialog if needed
-        if (mDeleteDialogVisible) {
-            mDeleteHelper = new DeleteEventHelper(
-                    mContext, mActivity,
-                    !mIsDialog && !mIsTabletConfig /* exitWhenDone */);
-            mDeleteHelper.setOnDismissListener(createDeleteOnDismissListener());
-            mDeleteHelper.delete(mStartMillis, mEndMillis, mEventId, -1, onDeleteRunnable);
-        } else if (mTentativeUserSetResponse != Attendees.ATTENDEE_STATUS_NONE) {
+        if (mTentativeUserSetResponse != Attendees.ATTENDEE_STATUS_NONE) {
             int buttonId = findButtonIdForResponse(mTentativeUserSetResponse);
             mResponseRadioGroup.check(buttonId);
             mEditResponseHelper.showDialog(mEditResponseHelper.getWhichEvents());
@@ -2122,6 +1989,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
 
     @Override
     public void onClick(View view) {
+      Log.d("In EventInfoFragment:", "line#: 2130");
 
         // This must be a click on one of the "remove reminder" buttons
         LinearLayout reminderItem = (LinearLayout) view.getParent();
@@ -2186,53 +2054,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         }
     }
 
-
-    private boolean saveReminders() {
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>(3);
-
-        // Read reminders from UI
-        mReminders = EventViewUtils.reminderItemsToReminders(mReminderViews,
-                mReminderMinuteValues, mReminderMethodValues);
-        mOriginalReminders.addAll(mUnsupportedReminders);
-        Collections.sort(mOriginalReminders);
-        mReminders.addAll(mUnsupportedReminders);
-        Collections.sort(mReminders);
-
-        // Check if there are any changes in the reminder
-        boolean changed = EditEventHelper.saveReminders(ops, mEventId, mReminders,
-                mOriginalReminders, false /* no force save */);
-
-        if (!changed) {
-            return false;
-        }
-
-        // save new reminders
-        AsyncQueryService service = new AsyncQueryService(getActivity());
-        service.startBatch(0, null, Calendars.CONTENT_URI.getAuthority(), ops, 0);
-        mOriginalReminders = mReminders;
-        // Update the "hasAlarm" field for the event
-        Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, mEventId);
-        int len = mReminders.size();
-        boolean hasAlarm = len > 0;
-        if (hasAlarm != mHasAlarm) {
-            ContentValues values = new ContentValues();
-            values.put(Events.HAS_ALARM, hasAlarm ? 1 : 0);
-            service.startUpdate(0, null, uri, values, null, null, 0);
-        }
-        return true;
-    }
-
-    /**
-     * Email all the attendees of the event, except for the viewer (so as to not email
-     * himself) and resources like conference rooms.
-     */
-    private void emailAttendees() {
-        Intent i = new Intent(getActivity(), QuickResponseActivity.class);
-        i.putExtra(QuickResponseActivity.EXTRA_EVENT_ID, mEventId);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(i);
-    }
-
     /**
      * Loads an integer array asset into a list.
      */
@@ -2254,11 +2075,6 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         String[] labels = r.getStringArray(resNum);
         ArrayList<String> list = new ArrayList<String>(Arrays.asList(labels));
         return list;
-    }
-
-    @Override
-    public void onDeleteStarted() {
-        mEventDeletionStarted = true;
     }
 
     private Dialog.OnDismissListener createDeleteOnDismissListener() {

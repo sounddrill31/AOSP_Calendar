@@ -52,8 +52,6 @@ public class EditEventActivity extends AbstractCalendarActivity {
 
     private static boolean mIsMultipane;
 
-    private EditEventFragment mEditFragment;
-
     private ArrayList<ReminderEntry> mReminders;
 
     private int mEventColor;
@@ -73,8 +71,6 @@ public class EditEventActivity extends AbstractCalendarActivity {
         mEventColor = getIntent().getIntExtra(EXTRA_EVENT_COLOR, -1);
 
 
-        mEditFragment = (EditEventFragment) getFragmentManager().findFragmentById(R.id.main_frame);
-
         mIsMultipane = Utils.getConfigBool(this, R.bool.multiple_pane_config);
 
         if (mIsMultipane) {
@@ -89,24 +85,6 @@ public class EditEventActivity extends AbstractCalendarActivity {
             getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
                     ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_HOME|
                     ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_CUSTOM);
-        }
-
-        if (mEditFragment == null) {
-            Intent intent = null;
-            if (mEventInfo.id == -1) {
-                intent = getIntent();
-            }
-
-            mEditFragment = new EditEventFragment(mEventInfo, mReminders, mEventColorInitialized,
-                    mEventColor, false, intent);
-
-            mEditFragment.mShowModifyDialogOnLaunch = getIntent().getBooleanExtra(
-                    CalendarController.EVENT_EDIT_ON_LAUNCH, false);
-
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.replace(R.id.main_frame, mEditFragment);
-            ft.show(mEditFragment);
-            ft.commit();
         }
     }
 
