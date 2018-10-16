@@ -18,19 +18,4 @@
     android:orientation="horizontal"
     android:layout_height="wrap_content"
     android:layout_width="match_parent">
-
-    <ImageView android:id="@+id/reminder_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@drawable/ic_alarm_dark"
-        android:focusable="false"
-        android:clickable="false"
-    />
-
-    <TextView android:id="@+id/reminder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/TextAppearance.AgendaView_ValueLabel"
-    />
 </LinearLayout>

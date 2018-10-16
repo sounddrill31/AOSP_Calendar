@@ -24,8 +24,6 @@ import static android.provider.CalendarContract.Attendees.ATTENDEE_STATUS;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
-import android.app.SearchManager;
-import android.app.SearchableInfo;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -39,9 +37,6 @@ import android.provider.CalendarContract.Events;
 import android.text.format.Time;
 import android.util.Log;
 import android.util.Pair;
-
-import com.android.calendar.event.EditEventActivity;
-import com.android.calendar.selectcalendars.SelectVisibleCalendarsActivity;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
@@ -81,8 +76,6 @@ public class CalendarController {
     private final WeakHashMap<Object, Long> filters = new WeakHashMap<Object, Long>(1);
 
     private int mViewType = -1;
-    private int mDetailViewType = -1;
-    private int mPreviousViewType = -1;
     private long mEventId = -1;
     private final Time mTime = new Time();
     private long mDateFlags = 0;
@@ -165,7 +158,6 @@ public class CalendarController {
 
         public int x; // x coordinate in the activity space
         public int y; // y coordinate in the activity space
-        public String query; // query for a user search
         public ComponentName componentName;  // used in combination with query
         public String eventTitle;
         public long calendarId;
@@ -201,24 +193,6 @@ public class CalendarController {
         }
 
         public  int getResponse() {
-            if (eventType != EventType.VIEW_EVENT) {
-                Log.wtf(TAG, "illegal call to getResponse , wrong event type " + eventType);
-                return Attendees.ATTENDEE_STATUS_NONE;
-            }
-
-            int response = (int)(extraLong & ATTENTEE_STATUS_MASK);
-            switch (response) {
-                case ATTENDEE_STATUS_NONE_MASK:
-                    return Attendees.ATTENDEE_STATUS_NONE;
-                case ATTENDEE_STATUS_ACCEPTED_MASK:
-                    return Attendees.ATTENDEE_STATUS_ACCEPTED;
-                case ATTENDEE_STATUS_DECLINED_MASK:
-                    return Attendees.ATTENDEE_STATUS_DECLINED;
-                case ATTENDEE_STATUS_TENTATIVE_MASK:
-                    return Attendees.ATTENDEE_STATUS_TENTATIVE;
-                default:
-                    Log.wtf(TAG,"Unknown attendee response " + response);
-            }
             return ATTENDEE_STATUS_NONE_MASK;
         }
 
@@ -228,17 +202,9 @@ public class CalendarController {
 
             switch (response) {
                 case Attendees.ATTENDEE_STATUS_NONE:
-                    extra |= ATTENDEE_STATUS_NONE_MASK;
-                    break;
                 case Attendees.ATTENDEE_STATUS_ACCEPTED:
-                    extra |= ATTENDEE_STATUS_ACCEPTED_MASK;
-                    break;
                 case Attendees.ATTENDEE_STATUS_DECLINED:
-                    extra |= ATTENDEE_STATUS_DECLINED_MASK;
-                    break;
                 case Attendees.ATTENDEE_STATUS_TENTATIVE:
-                    extra |= ATTENDEE_STATUS_TENTATIVE_MASK;
-                    break;
                 default:
                     Log.wtf(TAG,"Unknown attendee response " + response);
                     extra |= ATTENDEE_STATUS_NONE_MASK;
@@ -282,16 +248,8 @@ public class CalendarController {
      */
     public static CalendarController getInstance(Context context) {
         synchronized (instances) {
-            CalendarController controller = null;
-            WeakReference<CalendarController> weakController = instances.get(context);
-            if (weakController != null) {
-                controller = weakController.get();
-            }
-
-            if (controller == null) {
-                controller = new CalendarController(context);
-                instances.put(context, new WeakReference(controller));
-            }
+            CalendarController controller = new CalendarController(context);
+            instances.put(context, new WeakReference(controller));
             return controller;
         }
     }
@@ -310,9 +268,6 @@ public class CalendarController {
         mContext = context;
         mUpdateTimezone.run();
         mTime.setToNow();
-        mDetailViewType = Utils.getSharedPreference(mContext,
-                GeneralPreferences.KEY_DETAILED_VIEW,
-                GeneralPreferences.DEFAULT_DETAILED_VIEW);
     }
 
     public void sendEventRelatedEvent(Object sender, long eventType, long eventId, long startMillis,
@@ -367,9 +322,6 @@ public class CalendarController {
           long selectedMillis, String title, long calendarId) {
         EventInfo info = new EventInfo();
         info.eventType = eventType;
-        if (eventType == EventType.EDIT_EVENT || eventType == EventType.VIEW_EVENT_DETAILS) {
-            info.viewType = ViewType.CURRENT;
-        }
 
         info.id = eventId;
         info.startTime = new Time(Utils.getTimeZone(mContext, mUpdateTimezone));
@@ -423,261 +375,12 @@ public class CalendarController {
         info.endTime = end;
         info.id = eventId;
         info.viewType = viewType;
-        info.query = query;
         info.componentName = componentName;
         info.extraLong = extraLong;
         this.sendEvent(sender, info);
     }
 
     public void sendEvent(Object sender, final EventInfo event) {
-        // TODO Throw exception on invalid events
-
-        if (DEBUG) {
-            Log.d(TAG, eventInfoToString(event));
-        }
-
-        Long filteredTypes = filters.get(sender);
-        if (filteredTypes != null && (filteredTypes.longValue() & event.eventType) != 0) {
-            // Suppress event per filter
-            if (DEBUG) {
-                Log.d(TAG, "Event suppressed");
-            }
-            return;
-        }
-
-        mPreviousViewType = mViewType;
-
-        // Fix up view if not specified
-        if (event.viewType == ViewType.DETAIL) {
-            event.viewType = mDetailViewType;
-            mViewType = mDetailViewType;
-        } else if (event.viewType == ViewType.CURRENT) {
-            event.viewType = mViewType;
-        } else if (event.viewType != ViewType.EDIT) {
-            mViewType = event.viewType;
-
-            if (event.viewType == ViewType.AGENDA || event.viewType == ViewType.DAY
-                    || (Utils.getAllowWeekForDetailView() && event.viewType == ViewType.WEEK)) {
-                mDetailViewType = mViewType;
-            }
-        }
-
-        if (DEBUG) {
-            Log.d(TAG, "vvvvvvvvvvvvvvv");
-            Log.d(TAG, "Start  " + (event.startTime == null ? "null" : event.startTime.toString()));
-            Log.d(TAG, "End    " + (event.endTime == null ? "null" : event.endTime.toString()));
-            Log.d(TAG, "Select " + (event.selectedTime == null ? "null" : event.selectedTime.toString()));
-            Log.d(TAG, "mTime  " + (mTime == null ? "null" : mTime.toString()));
-        }
-
-        long startMillis = 0;
-        if (event.startTime != null) {
-            startMillis = event.startTime.toMillis(false);
-        }
-
-        // Set mTime if selectedTime is set
-        if (event.selectedTime != null && event.selectedTime.toMillis(false) != 0) {
-            mTime.set(event.selectedTime);
-        } else {
-            if (startMillis != 0) {
-                // selectedTime is not set so set mTime to startTime iff it is not
-                // within start and end times
-                long mtimeMillis = mTime.toMillis(false);
-                if (mtimeMillis < startMillis
-                        || (event.endTime != null && mtimeMillis > event.endTime.toMillis(false))) {
-                    mTime.set(event.startTime);
-                }
-            }
-            event.selectedTime = mTime;
-        }
-        // Store the formatting flags if this is an update to the title
-        if (event.eventType == EventType.UPDATE_TITLE) {
-            mDateFlags = event.extraLong;
-        }
-
-        // Fix up start time if not specified
-        if (startMillis == 0) {
-            event.startTime = mTime;
-        }
-        if (DEBUG) {
-            Log.d(TAG, "Start  " + (event.startTime == null ? "null" : event.startTime.toString()));
-            Log.d(TAG, "End    " + (event.endTime == null ? "null" : event.endTime.toString()));
-            Log.d(TAG, "Select " + (event.selectedTime == null ? "null" : event.selectedTime.toString()));
-            Log.d(TAG, "mTime  " + (mTime == null ? "null" : mTime.toString()));
-            Log.d(TAG, "^^^^^^^^^^^^^^^");
-        }
-
-        // Store the eventId if we're entering edit event
-        if ((event.eventType
-                & (EventType.CREATE_EVENT | EventType.EDIT_EVENT | EventType.VIEW_EVENT_DETAILS))
-                != 0) {
-            if (event.id > 0) {
-                mEventId = event.id;
-            } else {
-                mEventId = -1;
-            }
-        }
-
-        boolean handled = false;
-        synchronized (this) {
-            mDispatchInProgressCounter ++;
-
-            if (DEBUG) {
-                Log.d(TAG, "sendEvent: Dispatching to " + eventHandlers.size() + " handlers");
-            }
-            // Dispatch to event handler(s)
-            if (mFirstEventHandler != null) {
-                // Handle the 'first' one before handling the others
-                EventHandler handler = mFirstEventHandler.second;
-                if (handler != null && (handler.getSupportedEventTypes() & event.eventType) != 0
-                        && !mToBeRemovedEventHandlers.contains(mFirstEventHandler.first)) {
-                    handler.handleEvent(event);
-                    handled = true;
-                }
-            }
-            for (Iterator<Entry<Integer, EventHandler>> handlers =
-                    eventHandlers.entrySet().iterator(); handlers.hasNext();) {
-                Entry<Integer, EventHandler> entry = handlers.next();
-                int key = entry.getKey();
-                if (mFirstEventHandler != null && key == mFirstEventHandler.first) {
-                    // If this was the 'first' handler it was already handled
-                    continue;
-                }
-                EventHandler eventHandler = entry.getValue();
-                if (eventHandler != null
-                        && (eventHandler.getSupportedEventTypes() & event.eventType) != 0) {
-                    if (mToBeRemovedEventHandlers.contains(key)) {
-                        continue;
-                    }
-                    eventHandler.handleEvent(event);
-                    handled = true;
-                }
-            }
-
-            mDispatchInProgressCounter --;
-
-            if (mDispatchInProgressCounter == 0) {
-
-                // Deregister removed handlers
-                if (mToBeRemovedEventHandlers.size() > 0) {
-                    for (Integer zombie : mToBeRemovedEventHandlers) {
-                        eventHandlers.remove(zombie);
-                        if (mFirstEventHandler != null && zombie.equals(mFirstEventHandler.first)) {
-                            mFirstEventHandler = null;
-                        }
-                    }
-                    mToBeRemovedEventHandlers.clear();
-                }
-                // Add new handlers
-                if (mToBeAddedFirstEventHandler != null) {
-                    mFirstEventHandler = mToBeAddedFirstEventHandler;
-                    mToBeAddedFirstEventHandler = null;
-                }
-                if (mToBeAddedEventHandlers.size() > 0) {
-                    for (Entry<Integer, EventHandler> food : mToBeAddedEventHandlers.entrySet()) {
-                        eventHandlers.put(food.getKey(), food.getValue());
-                    }
-                }
-            }
-        }
-
-        if (!handled) {
-            // Launch Settings
-            if (event.eventType == EventType.LAUNCH_SETTINGS) {
-                launchSettings();
-                return;
-            }
-
-            // Launch Calendar Visible Selector
-            if (event.eventType == EventType.LAUNCH_SELECT_VISIBLE_CALENDARS) {
-                launchSelectVisibleCalendars();
-                return;
-            }
-
-            // Create/View/Edit/Delete Event
-            long endTime = (event.endTime == null) ? -1 : event.endTime.toMillis(false);
-            if (event.eventType == EventType.CREATE_EVENT) {
-                launchCreateEvent(event.startTime.toMillis(false), endTime,
-                        event.extraLong == EXTRA_CREATE_ALL_DAY, event.eventTitle,
-                        event.calendarId);
-                return;
-            } else if (event.eventType == EventType.VIEW_EVENT) {
-                launchViewEvent(event.id, event.startTime.toMillis(false), endTime,
-                        event.getResponse());
-                return;
-            } else if (event.eventType == EventType.EDIT_EVENT) {
-                launchEditEvent(event.id, event.startTime.toMillis(false), endTime, true);
-                return;
-            } else if (event.eventType == EventType.VIEW_EVENT_DETAILS) {
-                launchEditEvent(event.id, event.startTime.toMillis(false), endTime, false);
-                return;
-            } else if (event.eventType == EventType.DELETE_EVENT) {
-                launchDeleteEvent(event.id, event.startTime.toMillis(false), endTime);
-                return;
-            } else if (event.eventType == EventType.SEARCH) {
-                launchSearch(event.id, event.query, event.componentName);
-                return;
-            }
-        }
-    }
-
-    /**
-     * Adds or updates an event handler. This uses a LinkedHashMap so that we can
-     * replace fragments based on the view id they are being expanded into.
-     *
-     * @param key The view id or placeholder for this handler
-     * @param eventHandler Typically a fragment or activity in the calendar app
-     */
-    public void registerEventHandler(int key, EventHandler eventHandler) {
-        synchronized (this) {
-            if (mDispatchInProgressCounter > 0) {
-                mToBeAddedEventHandlers.put(key, eventHandler);
-            } else {
-                eventHandlers.put(key, eventHandler);
-            }
-        }
-    }
-
-    public void registerFirstEventHandler(int key, EventHandler eventHandler) {
-        synchronized (this) {
-            registerEventHandler(key, eventHandler);
-            if (mDispatchInProgressCounter > 0) {
-                mToBeAddedFirstEventHandler = new Pair<Integer, EventHandler>(key, eventHandler);
-            } else {
-                mFirstEventHandler = new Pair<Integer, EventHandler>(key, eventHandler);
-            }
-        }
-    }
-
-    public void deregisterEventHandler(Integer key) {
-        synchronized (this) {
-            if (mDispatchInProgressCounter > 0) {
-                // To avoid ConcurrencyException, stash away the event handler for now.
-                mToBeRemovedEventHandlers.add(key);
-            } else {
-                eventHandlers.remove(key);
-                if (mFirstEventHandler != null && mFirstEventHandler.first == key) {
-                    mFirstEventHandler = null;
-                }
-            }
-        }
-    }
-
-    public void deregisterAllEventHandlers() {
-        synchronized (this) {
-            if (mDispatchInProgressCounter > 0) {
-                // To avoid ConcurrencyException, stash away the event handler for now.
-                mToBeRemovedEventHandlers.addAll(eventHandlers.keySet());
-            } else {
-                eventHandlers.clear();
-                mFirstEventHandler = null;
-            }
-        }
-    }
-
-    // FRAG_TODO doesn't work yet
-    public void filterBroadcasts(Object sender, long eventTypes) {
-        filters.put(sender, eventTypes);
     }
 
     /**
@@ -716,111 +419,13 @@ public class CalendarController {
     }
 
     public int getPreviousViewType() {
-        return mPreviousViewType;
-    }
-
-    private void launchSelectVisibleCalendars() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setClass(mContext, SelectVisibleCalendarsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        mContext.startActivity(intent);
-    }
-
-    private void launchSettings() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setClass(mContext, CalendarSettingsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        mContext.startActivity(intent);
-    }
-
-    private void launchCreateEvent(long startMillis, long endMillis, boolean allDayEvent,
-            String title, long calendarId) {
-        Intent intent = generateCreateEventIntent(startMillis, endMillis, allDayEvent, title,
-            calendarId);
-        mEventId = -1;
-        mContext.startActivity(intent);
-    }
-
-    public Intent generateCreateEventIntent(long startMillis, long endMillis,
-        boolean allDayEvent, String title, long calendarId) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setClass(mContext, EditEventActivity.class);
-        intent.putExtra(EXTRA_EVENT_BEGIN_TIME, startMillis);
-        intent.putExtra(EXTRA_EVENT_END_TIME, endMillis);
-        intent.putExtra(EXTRA_EVENT_ALL_DAY, allDayEvent);
-        intent.putExtra(Events.CALENDAR_ID, calendarId);
-        intent.putExtra(Events.TITLE, title);
-        return intent;
-    }
-
-    public void launchViewEvent(long eventId, long startMillis, long endMillis, int response) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
-        intent.setData(eventUri);
-        intent.setClass(mContext, AllInOneActivity.class);
-        intent.putExtra(EXTRA_EVENT_BEGIN_TIME, startMillis);
-        intent.putExtra(EXTRA_EVENT_END_TIME, endMillis);
-        intent.putExtra(ATTENDEE_STATUS, response);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        mContext.startActivity(intent);
-    }
-
-    private void launchEditEvent(long eventId, long startMillis, long endMillis, boolean edit) {
-        Uri uri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
-        Intent intent = new Intent(Intent.ACTION_EDIT, uri);
-        intent.putExtra(EXTRA_EVENT_BEGIN_TIME, startMillis);
-        intent.putExtra(EXTRA_EVENT_END_TIME, endMillis);
-        intent.setClass(mContext, EditEventActivity.class);
-        intent.putExtra(EVENT_EDIT_ON_LAUNCH, edit);
-        mEventId = eventId;
-        mContext.startActivity(intent);
-    }
-
-//    private void launchAlerts() {
-//        Intent intent = new Intent();
-//        intent.setClass(mContext, AlertActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        mContext.startActivity(intent);
-//    }
-
-    private void launchDeleteEvent(long eventId, long startMillis, long endMillis) {
-        launchDeleteEventAndFinish(null, eventId, startMillis, endMillis, -1);
-    }
-
-    private void launchDeleteEventAndFinish(Activity parentActivity, long eventId, long startMillis,
-            long endMillis, int deleteWhich) {
-        DeleteEventHelper deleteEventHelper = new DeleteEventHelper(mContext, parentActivity,
-                parentActivity != null /* exit when done */);
-        deleteEventHelper.delete(startMillis, endMillis, eventId, deleteWhich);
-    }
-
-    private void launchSearch(long eventId, String query, ComponentName componentName) {
-        final SearchManager searchManager =
-                (SearchManager)mContext.getSystemService(Context.SEARCH_SERVICE);
-        final SearchableInfo searchableInfo = searchManager.getSearchableInfo(componentName);
-        final Intent intent = new Intent(Intent.ACTION_SEARCH);
-        intent.putExtra(SearchManager.QUERY, query);
-        intent.setComponent(searchableInfo.getSearchActivity());
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        mContext.startActivity(intent);
+        return ViewType.DAY;
     }
 
     /**
      * Performs a manual refresh of calendars in all known accounts.
      */
     public void refreshCalendars() {
-        Account[] accounts = AccountManager.get(mContext).getAccounts();
-        Log.d(TAG, "Refreshing " + accounts.length + " accounts");
-
-        String authority = Calendars.CONTENT_URI.getAuthority();
-        for (int i = 0; i < accounts.length; i++) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "Refreshing calendars for: " + accounts[i]);
-            }
-            Bundle extras = new Bundle();
-            extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-            ContentResolver.requestSync(accounts[i], authority, extras);
-        }
     }
 
     // Forces the viewType. Should only be used for initialization.
@@ -849,14 +454,8 @@ public class CalendarController {
             tmp = "Edit event";
         } else if ((eventInfo.eventType & EventType.DELETE_EVENT) != 0) {
             tmp = "Delete event";
-        } else if ((eventInfo.eventType & EventType.LAUNCH_SELECT_VISIBLE_CALENDARS) != 0) {
-            tmp = "Launch select visible calendars";
-        } else if ((eventInfo.eventType & EventType.LAUNCH_SETTINGS) != 0) {
-            tmp = "Launch settings";
         } else if ((eventInfo.eventType & EventType.EVENTS_CHANGED) != 0) {
             tmp = "Refresh events";
-        } else if ((eventInfo.eventType & EventType.SEARCH) != 0) {
-            tmp = "Search";
         } else if ((eventInfo.eventType & EventType.USER_HOME) != 0) {
             tmp = "Gone home";
         } else if ((eventInfo.eventType & EventType.UPDATE_TITLE) != 0) {
