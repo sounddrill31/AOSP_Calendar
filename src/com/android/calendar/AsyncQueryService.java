@@ -16,8 +16,6 @@
 
 package com.android.calendar;
 
-import com.android.calendar.AsyncQueryServiceHelper.OperationInfo;
-
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
@@ -121,29 +119,6 @@ public class AsyncQueryService extends Handler {
     }
 
     /**
-     * Gets the last delayed operation. It is typically used for canceling.
-     *
-     * @return Operation object which contains of the last cancelable operation
-     */
-    public final Operation getLastCancelableOperation() {
-        return AsyncQueryServiceHelper.getLastCancelableOperation();
-    }
-
-    /**
-     * Attempts to cancel operation that has not already started. Note that
-     * there is no guarantee that the operation will be canceled. They still may
-     * result in a call to on[Query/Insert/Update/Delete/Batch]Complete after
-     * this call has completed.
-     *
-     * @param token The token representing the operation to be canceled. If
-     *            multiple operations have the same token they will all be
-     *            canceled.
-     */
-    public final int cancelOperation(int token) {
-        return AsyncQueryServiceHelper.cancelOperation(token);
-    }
-
-    /**
      * This method begins an asynchronous query. When the query is done
      * {@link #onQueryComplete} is called.
      *
@@ -168,20 +143,6 @@ public class AsyncQueryService extends Handler {
      */
     public void startQuery(int token, Object cookie, Uri uri, String[] projection,
             String selection, String[] selectionArgs, String orderBy) {
-        OperationInfo info = new OperationInfo();
-        info.op = Operation.EVENT_ARG_QUERY;
-        info.resolver = mContext.getContentResolver();
-
-        info.handler = mHandler;
-        info.token = token;
-        info.cookie = cookie;
-        info.uri = uri;
-        info.projection = projection;
-        info.selection = selection;
-        info.selectionArgs = selectionArgs;
-        info.orderBy = orderBy;
-
-        AsyncQueryServiceHelper.queueOperation(mContext, info);
     }
 
     /**
@@ -200,18 +161,6 @@ public class AsyncQueryService extends Handler {
      */
     public void startInsert(int token, Object cookie, Uri uri, ContentValues initialValues,
             long delayMillis) {
-        OperationInfo info = new OperationInfo();
-        info.op = Operation.EVENT_ARG_INSERT;
-        info.resolver = mContext.getContentResolver();
-        info.handler = mHandler;
-
-        info.token = token;
-        info.cookie = cookie;
-        info.uri = uri;
-        info.values = initialValues;
-        info.delayMillis = delayMillis;
-
-        AsyncQueryServiceHelper.queueOperation(mContext, info);
     }
 
     /**
@@ -236,20 +185,6 @@ public class AsyncQueryService extends Handler {
      */
     public void startUpdate(int token, Object cookie, Uri uri, ContentValues values,
             String selection, String[] selectionArgs, long delayMillis) {
-        OperationInfo info = new OperationInfo();
-        info.op = Operation.EVENT_ARG_UPDATE;
-        info.resolver = mContext.getContentResolver();
-        info.handler = mHandler;
-
-        info.token = token;
-        info.cookie = cookie;
-        info.uri = uri;
-        info.values = values;
-        info.selection = selection;
-        info.selectionArgs = selectionArgs;
-        info.delayMillis = delayMillis;
-
-        AsyncQueryServiceHelper.queueOperation(mContext, info);
     }
 
     /**
@@ -273,19 +208,6 @@ public class AsyncQueryService extends Handler {
      */
     public void startDelete(int token, Object cookie, Uri uri, String selection,
             String[] selectionArgs, long delayMillis) {
-        OperationInfo info = new OperationInfo();
-        info.op = Operation.EVENT_ARG_DELETE;
-        info.resolver = mContext.getContentResolver();
-        info.handler = mHandler;
-
-        info.token = token;
-        info.cookie = cookie;
-        info.uri = uri;
-        info.selection = selection;
-        info.selectionArgs = selectionArgs;
-        info.delayMillis = delayMillis;
-
-        AsyncQueryServiceHelper.queueOperation(mContext, info);
     }
 
     /**
@@ -304,18 +226,6 @@ public class AsyncQueryService extends Handler {
      */
     public void startBatch(int token, Object cookie, String authority,
             ArrayList<ContentProviderOperation> cpo, long delayMillis) {
-        OperationInfo info = new OperationInfo();
-        info.op = Operation.EVENT_ARG_BATCH;
-        info.resolver = mContext.getContentResolver();
-        info.handler = mHandler;
-
-        info.token = token;
-        info.cookie = cookie;
-        info.authority = authority;
-        info.cpo = cpo;
-        info.delayMillis = delayMillis;
-
-        AsyncQueryServiceHelper.queueOperation(mContext, info);
     }
 
     /**
@@ -396,38 +306,6 @@ public class AsyncQueryService extends Handler {
 
     @Override
     public void handleMessage(Message msg) {
-        OperationInfo info = (OperationInfo) msg.obj;
-
-        int token = msg.what;
-        int op = msg.arg1;
-
-        if (localLOGV) {
-            Log.d(TAG, "AsyncQueryService.handleMessage: token=" + token + ", op=" + op
-                    + ", result=" + info.result);
-        }
-
-        // pass token back to caller on each callback.
-        switch (op) {
-            case Operation.EVENT_ARG_QUERY:
-                onQueryComplete(token, info.cookie, (Cursor) info.result);
-                break;
-
-            case Operation.EVENT_ARG_INSERT:
-                onInsertComplete(token, info.cookie, (Uri) info.result);
-                break;
-
-            case Operation.EVENT_ARG_UPDATE:
-                onUpdateComplete(token, info.cookie, (Integer) info.result);
-                break;
-
-            case Operation.EVENT_ARG_DELETE:
-                onDeleteComplete(token, info.cookie, (Integer) info.result);
-                break;
-
-            case Operation.EVENT_ARG_BATCH:
-                onBatchComplete(token, info.cookie, (ContentProviderResult[]) info.result);
-                break;
-        }
     }
 
 //    @VisibleForTesting
