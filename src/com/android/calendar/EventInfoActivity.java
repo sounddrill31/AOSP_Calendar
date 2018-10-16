@@ -40,9 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EventInfoActivity extends Activity {
-//        implements CalendarController.EventHandler, SearchView.OnQueryTextListener,
-//        SearchView.OnCloseListener {
-
     private static final String TAG = "EventInfoActivity";
     private EventInfoFragment mInfoFragment;
     private long mStartMillis, mEndMillis;
