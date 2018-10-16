@@ -26,8 +26,6 @@ import android.provider.CalendarContract.Reminders;
 import android.text.TextUtils;
 import android.text.util.Rfc822Token;
 
-import com.android.calendar.event.EditEventHelper;
-import com.android.calendar.event.EventColorCache;
 import com.android.common.Rfc822Validator;
 
 import java.io.Serializable;
@@ -214,7 +212,6 @@ public class CalendarEventModel implements Serializable {
     public String mSyncAccount = null;
     public String mSyncAccountType = null;
 
-    public EventColorCache mEventColorCache;
     private int mEventColor = -1;
     private boolean mEventColorInitialized = false;
 
@@ -274,14 +271,9 @@ public class CalendarEventModel implements Serializable {
     public ArrayList<ReminderEntry> mReminders;
     public ArrayList<ReminderEntry> mDefaultReminders;
 
-    // PROVIDER_NOTES Using EditEventHelper the owner should not be included in this
-    // list and will instead be added by saveEvent. Is this what we want?
-    public LinkedHashMap<String, Attendee> mAttendeesList;
-
     public CalendarEventModel() {
         mReminders = new ArrayList<ReminderEntry>();
         mDefaultReminders = new ArrayList<ReminderEntry>();
-        mAttendeesList = new LinkedHashMap<String, Attendee>();
         mTimezone = TimeZone.getDefault().getID();
     }
 
@@ -343,19 +335,6 @@ public class CalendarEventModel implements Serializable {
         if (!TextUtils.isEmpty(rrule)) {
             mRrule = rrule;
         }
-
-        String emails = intent.getStringExtra(Intent.EXTRA_EMAIL);
-        if (!TextUtils.isEmpty(emails)) {
-            String[] emailArray = emails.split("[ ,;]");
-            for (String email : emailArray) {
-                if (!TextUtils.isEmpty(email) && email.contains("@")) {
-                    email = email.trim();
-                    if (!mAttendeesList.containsKey(email)) {
-                        mAttendeesList.put(email, new Attendee("", email));
-                    }
-                }
-            }
-        }
     }
 
     public boolean isValid() {
@@ -391,7 +370,6 @@ public class CalendarEventModel implements Serializable {
         mCalendarColor = -1;
         mCalendarColorInitialized = false;
 
-        mEventColorCache = null;
         mEventColor = -1;
         mEventColorInitialized = false;
 
@@ -440,42 +418,19 @@ public class CalendarEventModel implements Serializable {
         mCalendarAllowedAvailability = null;
 
         mReminders = new ArrayList<ReminderEntry>();
-        mAttendeesList.clear();
     }
 
     public void addAttendee(Attendee attendee) {
-        mAttendeesList.put(attendee.mEmail, attendee);
     }
 
     public void addAttendees(String attendees, Rfc822Validator validator) {
-        final LinkedHashSet<Rfc822Token> addresses = EditEventHelper.getAddressesFromList(
-                attendees, validator);
-        synchronized (this) {
-            for (final Rfc822Token address : addresses) {
-                final Attendee attendee = new Attendee(address.getName(), address.getAddress());
-                if (TextUtils.isEmpty(attendee.mName)) {
-                    attendee.mName = attendee.mEmail;
-                }
-                addAttendee(attendee);
-            }
-        }
     }
 
     public void removeAttendee(Attendee attendee) {
-        mAttendeesList.remove(attendee.mEmail);
     }
 
     public String getAttendeesString() {
-        StringBuilder b = new StringBuilder();
-        for (Attendee attendee : mAttendeesList.values()) {
-            String name = attendee.mName;
-            String email = attendee.mEmail;
-            String status = Integer.toString(attendee.mStatus);
-            b.append("name:").append(name);
-            b.append(" email:").append(email);
-            b.append(" status:").append(status);
-        }
-        return b.toString();
+        return new String();
     }
 
     @Override
@@ -483,7 +438,6 @@ public class CalendarEventModel implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + (mAllDay ? 1231 : 1237);
-        result = prime * result + ((mAttendeesList == null) ? 0 : getAttendeesString().hashCode());
         result = prime * result + (int) (mCalendarId ^ (mCalendarId >>> 32));
         result = prime * result + ((mDescription == null) ? 0 : mDescription.hashCode());
         result = prime * result + ((mDuration == null) ? 0 : mDuration.hashCode());
@@ -709,14 +663,6 @@ public class CalendarEventModel implements Serializable {
         if (mAllDay != originalModel.mAllDay) {
             return false;
         }
-        if (mAttendeesList == null) {
-            if (originalModel.mAttendeesList != null) {
-                return false;
-            }
-        } else if (!mAttendeesList.equals(originalModel.mAttendeesList)) {
-            return false;
-        }
-
         if (mCalendarId != originalModel.mCalendarId) {
             return false;
         }
@@ -928,17 +874,10 @@ public class CalendarEventModel implements Serializable {
     }
 
     public int[] getCalendarEventColors() {
-        if (mEventColorCache != null) {
-            return mEventColorCache.getColorArray(mCalendarAccountName, mCalendarAccountType);
-        }
         return null;
     }
 
     public int getEventColorKey() {
-        if (mEventColorCache != null) {
-            return mEventColorCache.getColorKey(mCalendarAccountName, mCalendarAccountType,
-                    mEventColor);
-        }
         return -1;
     }
 }

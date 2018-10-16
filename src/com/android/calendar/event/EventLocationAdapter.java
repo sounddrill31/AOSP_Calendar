@@ -208,48 +208,9 @@ public class EventLocationAdapter extends ArrayAdapter<EventLocationAdapter.Resu
                 // the image.  Otherwise the async image update with using 'convertView' above
                 // resulted in the wrong list items being updated.
                 imageView.setTag(result.mContactPhotoUri);
-                if (result.mContactPhotoUri != null) {
-                    Bitmap cachedPhoto = mPhotoCache.get(result.mContactPhotoUri);
-                    if (cachedPhoto != null) {
-                        // Use photo in cache.
-                        imageView.setImageBitmap(cachedPhoto);
-                    } else {
-                        // Asynchronously load photo and update.
-                        asyncLoadPhotoAndUpdateView(result.mContactPhotoUri, imageView);
-                    }
-                }
             }
         }
         return view;
-    }
-
-    // TODO: Refactor to share code with ContactsAsyncHelper.
-    private void asyncLoadPhotoAndUpdateView(final Uri contactPhotoUri,
-            final ImageView imageView) {
-        AsyncTask<Void, Void, Bitmap> photoUpdaterTask =
-                new AsyncTask<Void, Void, Bitmap>() {
-            @Override
-            protected Bitmap doInBackground(Void... params) {
-                Bitmap photo = null;
-                InputStream imageStream = Contacts.openContactPhotoInputStream(
-                        mResolver, contactPhotoUri);
-                if (imageStream != null) {
-                    photo = BitmapFactory.decodeStream(imageStream);
-                    mPhotoCache.put(contactPhotoUri, photo);
-                }
-                return photo;
-            }
-
-            @Override
-            public void onPostExecute(Bitmap photo) {
-                // The View may have already been reused (because using 'convertView' above), so
-                // we must check the URI is as expected before setting the icon, or we may be
-                // setting the icon in other items.
-                if (photo != null && imageView.getTag() == contactPhotoUri) {
-                    imageView.setImageBitmap(photo);
-                }
-            }
-        }.execute();
     }
 
     /**
