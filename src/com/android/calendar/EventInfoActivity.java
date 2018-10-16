@@ -40,9 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EventInfoActivity extends Activity {
-//        implements CalendarController.EventHandler, SearchView.OnQueryTextListener,
-//        SearchView.OnCloseListener {
-
     private static final String TAG = "EventInfoActivity";
     private EventInfoFragment mInfoFragment;
     private long mStartMillis, mEndMillis;
@@ -59,9 +56,6 @@ public class EventInfoActivity extends Activity {
         @Override
         public void onChange(boolean selfChange) {
             if (selfChange) return;
-            if (mInfoFragment != null) {
-                mInfoFragment.reloadEvents();
-            }
         }
     };
 
@@ -129,8 +123,6 @@ public class EventInfoActivity extends Activity {
         Resources res = getResources();
         if (!res.getBoolean(R.bool.agenda_show_event_info_full_screen)
                 && !res.getBoolean(R.bool.show_event_info_full_screen)) {
-            CalendarController.getInstance(this)
-                    .launchViewEvent(mEventId, mStartMillis, mEndMillis, attendeeResponse);
             finish();
             return;
         }

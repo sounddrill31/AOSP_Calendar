@@ -59,9 +59,6 @@ public class CalendarUtils {
         private volatile static boolean mFirstTZRequest = true;
         private volatile static boolean mTZQueryInProgress = false;
 
-        private volatile static boolean mUseHomeTZ = false;
-        private volatile static String mHomeTZ = Time.getCurrentTimezone();
-
         private static HashSet<Runnable> mTZCallbacks = new HashSet<Runnable>();
         private static int mToken = 1;
         private static AsyncTZHandler mHandler;
@@ -93,42 +90,13 @@ public class CalendarUtils {
             @Override
             protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
                 synchronized (mTZCallbacks) {
-                    if (cursor == null) {
+                  if (cursor == null) {
                         mTZQueryInProgress = false;
                         mFirstTZRequest = true;
                         return;
                     }
 
-                    boolean writePrefs = false;
-                    // Check the values in the db
-                    int keyColumn = cursor.getColumnIndexOrThrow(CalendarCache.KEY);
-                    int valueColumn = cursor.getColumnIndexOrThrow(CalendarCache.VALUE);
-                    while(cursor.moveToNext()) {
-                        String key = cursor.getString(keyColumn);
-                        String value = cursor.getString(valueColumn);
-                        if (TextUtils.equals(key, CalendarCache.KEY_TIMEZONE_TYPE)) {
-                            boolean useHomeTZ = !TextUtils.equals(
-                                    value, CalendarCache.TIMEZONE_TYPE_AUTO);
-                            if (useHomeTZ != mUseHomeTZ) {
-                                writePrefs = true;
-                                mUseHomeTZ = useHomeTZ;
-                            }
-                        } else if (TextUtils.equals(
-                                key, CalendarCache.KEY_TIMEZONE_INSTANCES_PREVIOUS)) {
-                            if (!TextUtils.isEmpty(value) && !TextUtils.equals(mHomeTZ, value)) {
-                                writePrefs = true;
-                                mHomeTZ = value;
-                            }
-                        }
-                    }
                     cursor.close();
-                    if (writePrefs) {
-                        SharedPreferences prefs = getSharedPreferences((Context)cookie, mPrefsName);
-                        // Write the prefs
-                        setSharedPreference(prefs, KEY_HOME_TZ_ENABLED, mUseHomeTZ);
-                        setSharedPreference(prefs, KEY_HOME_TZ, mHomeTZ);
-                    }
-
                     mTZQueryInProgress = false;
                     for (Runnable callback : mTZCallbacks) {
                         if (callback != null) {
@@ -197,60 +165,6 @@ public class CalendarUtils {
          * {@link CalendarCache#TIMEZONE_TYPE_AUTO}
          */
         public void setTimeZone(Context context, String timeZone) {
-            if (TextUtils.isEmpty(timeZone)) {
-                if (DEBUG) {
-                    Log.d(TAG, "Empty time zone, nothing to be done.");
-                }
-                return;
-            }
-            boolean updatePrefs = false;
-            synchronized (mTZCallbacks) {
-                if (CalendarCache.TIMEZONE_TYPE_AUTO.equals(timeZone)) {
-                    if (mUseHomeTZ) {
-                        updatePrefs = true;
-                    }
-                    mUseHomeTZ = false;
-                } else {
-                    if (!mUseHomeTZ || !TextUtils.equals(mHomeTZ, timeZone)) {
-                        updatePrefs = true;
-                    }
-                    mUseHomeTZ = true;
-                    mHomeTZ = timeZone;
-                }
-            }
-            if (updatePrefs) {
-                // Write the prefs
-                SharedPreferences prefs = getSharedPreferences(context, mPrefsName);
-                setSharedPreference(prefs, KEY_HOME_TZ_ENABLED, mUseHomeTZ);
-                setSharedPreference(prefs, KEY_HOME_TZ, mHomeTZ);
-
-                // Update the db
-                ContentValues values = new ContentValues();
-                if (mHandler != null) {
-                    mHandler.cancelOperation(mToken);
-                }
-
-                mHandler = new AsyncTZHandler(context.getContentResolver());
-
-                // skip 0 so query can use it
-                if (++mToken == 0) {
-                    mToken = 1;
-                }
-
-                // Write the use home tz setting
-                values.put(CalendarCache.VALUE, mUseHomeTZ ? CalendarCache.TIMEZONE_TYPE_HOME
-                        : CalendarCache.TIMEZONE_TYPE_AUTO);
-                mHandler.startUpdate(mToken, null, CalendarCache.URI, values, "key=?",
-                        TIMEZONE_TYPE_ARGS);
-
-                // If using a home tz write it to the db
-                if (mUseHomeTZ) {
-                    ContentValues values2 = new ContentValues();
-                    values2.put(CalendarCache.VALUE, mHomeTZ);
-                    mHandler.startUpdate(mToken, null, CalendarCache.URI, values2,
-                            "key=?", TIMEZONE_INSTANCES_ARGS);
-                }
-            }
         }
 
         /**
@@ -269,32 +183,11 @@ public class CalendarUtils {
          */
         public String getTimeZone(Context context, Runnable callback) {
             synchronized (mTZCallbacks){
-                if (mFirstTZRequest) {
-                    SharedPreferences prefs = getSharedPreferences(context, mPrefsName);
-                    mUseHomeTZ = prefs.getBoolean(KEY_HOME_TZ_ENABLED, false);
-                    mHomeTZ = prefs.getString(KEY_HOME_TZ, Time.getCurrentTimezone());
-
-                    // Only check content resolver if we have a looper to attach to use
-                    if (Looper.myLooper() != null) {
-                        mTZQueryInProgress = true;
-                        mFirstTZRequest = false;
-
-                        // When the async query returns it should synchronize on
-                        // mTZCallbacks, update mUseHomeTZ, mHomeTZ, and the
-                        // preferences, set mTZQueryInProgress to false, and call all
-                        // the runnables in mTZCallbacks.
-                        if (mHandler == null) {
-                            mHandler = new AsyncTZHandler(context.getContentResolver());
-                        }
-                        mHandler.startQuery(0, context, CalendarCache.URI, CALENDAR_CACHE_POJECTION,
-                                null, null, null);
-                    }
-                }
                 if (mTZQueryInProgress) {
                     mTZCallbacks.add(callback);
                 }
             }
-            return mUseHomeTZ ? mHomeTZ : Time.getCurrentTimezone();
+            return Time.getCurrentTimezone();
         }
 
         /**
@@ -318,36 +211,6 @@ public class CalendarUtils {
             }
         }
     }
-
-        /**
-         * A helper method for writing a String value to the preferences
-         * asynchronously.
-         *
-         * @param context A context with access to the correct preferences
-         * @param key The preference to write to
-         * @param value The value to write
-         */
-        public static void setSharedPreference(SharedPreferences prefs, String key, String value) {
-//            SharedPreferences prefs = getSharedPreferences(context);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(key, value);
-            editor.apply();
-        }
-
-        /**
-         * A helper method for writing a boolean value to the preferences
-         * asynchronously.
-         *
-         * @param context A context with access to the correct preferences
-         * @param key The preference to write to
-         * @param value The value to write
-         */
-        public static void setSharedPreference(SharedPreferences prefs, String key, boolean value) {
-//            SharedPreferences prefs = getSharedPreferences(context, prefsName);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean(key, value);
-            editor.apply();
-        }
 
         /** Return a properly configured SharedPreferences instance */
         public static SharedPreferences getSharedPreferences(Context context, String prefsName) {

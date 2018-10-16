@@ -27,8 +27,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.ViewSwitcher;
 import android.widget.ViewSwitcher.ViewFactory;
@@ -48,10 +46,6 @@ public class DayFragment extends Fragment implements CalendarController.EventHan
 
     protected ProgressBar mProgressBar;
     protected ViewSwitcher mViewSwitcher;
-    protected Animation mInAnimationForward;
-    protected Animation mOutAnimationForward;
-    protected Animation mInAnimationBackward;
-    protected Animation mOutAnimationBackward;
     EventLoader mEventLoader;
 
     Time mSelectedDay = new Time();
@@ -88,11 +82,6 @@ public class DayFragment extends Fragment implements CalendarController.EventHan
         super.onCreate(icicle);
 
         Context context = getActivity();
-
-        mInAnimationForward = AnimationUtils.loadAnimation(context, R.anim.slide_left_in);
-        mOutAnimationForward = AnimationUtils.loadAnimation(context, R.anim.slide_left_out);
-        mInAnimationBackward = AnimationUtils.loadAnimation(context, R.anim.slide_right_in);
-        mOutAnimationBackward = AnimationUtils.loadAnimation(context, R.anim.slide_right_out);
 
         mEventLoader = new EventLoader(context);
     }
@@ -154,10 +143,6 @@ public class DayFragment extends Fragment implements CalendarController.EventHan
         view = (DayView) mViewSwitcher.getNextView();
         view.cleanup();
         mEventLoader.stopBackgroundThread();
-
-        // Stop events cross-fade animation
-        view.stopEventsAnimation();
-        ((DayView) mViewSwitcher.getNextView()).stopEventsAnimation();
     }
 
     void startProgressSpinner() {
@@ -186,15 +171,6 @@ public class DayFragment extends Fragment implements CalendarController.EventHan
             // In visible range. No need to switch view
             currentView.setSelected(goToTime, ignoreTime, animateToday);
         } else {
-            // Figure out which way to animate
-            if (diff > 0) {
-                mViewSwitcher.setInAnimation(mInAnimationForward);
-                mViewSwitcher.setOutAnimation(mOutAnimationForward);
-            } else {
-                mViewSwitcher.setInAnimation(mInAnimationBackward);
-                mViewSwitcher.setOutAnimation(mOutAnimationBackward);
-            }
-
             DayView next = (DayView) mViewSwitcher.getNextView();
             if (ignoreTime) {
                 next.setFirstVisibleHour(currentView.getFirstVisibleHour());
