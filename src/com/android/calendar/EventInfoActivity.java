@@ -40,9 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EventInfoActivity extends Activity {
-//        implements CalendarController.EventHandler, SearchView.OnQueryTextListener,
-//        SearchView.OnCloseListener {
-
     private static final String TAG = "EventInfoActivity";
     private EventInfoFragment mInfoFragment;
     private long mStartMillis, mEndMillis;
@@ -82,8 +79,6 @@ public class EventInfoActivity extends Activity {
             mEndMillis = icicle.getLong(EventInfoFragment.BUNDLE_KEY_END_MILLIS);
             attendeeResponse = icicle.getInt(EventInfoFragment.BUNDLE_KEY_ATTENDEE_RESPONSE);
             isDialog = icicle.getBoolean(EventInfoFragment.BUNDLE_KEY_IS_DIALOG);
-
-            reminders = Utils.readRemindersFromBundle(icicle);
         } else if (intent != null && Intent.ACTION_VIEW.equals(intent.getAction())) {
             mStartMillis = intent.getLongExtra(EXTRA_EVENT_BEGIN_TIME, 0);
             mEndMillis = intent.getLongExtra(EXTRA_EVENT_END_TIME, 0);
