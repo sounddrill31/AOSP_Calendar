@@ -405,17 +405,7 @@ public class GeneralPreferences extends PreferenceFragment implements
     public boolean onPreferenceTreeClick(
             PreferenceScreen preferenceScreen, Preference preference) {
         final String key = preference.getKey();
-        if (KEY_CLEAR_SEARCH_HISTORY.equals(key)) {
-            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getActivity(),
-                    Utils.getSearchAuthority(getActivity()),
-                    CalendarRecentSuggestionsProvider.MODE);
-            suggestions.clearHistory();
-            Toast.makeText(getActivity(), R.string.search_history_cleared,
-                    Toast.LENGTH_SHORT).show();
-            return true;
-        } else {
-            return super.onPreferenceTreeClick(preferenceScreen, preference);
-        }
+        return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 
     @Override
