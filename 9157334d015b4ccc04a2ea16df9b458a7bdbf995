@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "231fcb80_62ee5878",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 21
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1359095
+      },
+      "writtenOn": "2018-10-31T23:05:54Z",
+      "side": 1,
+      "message": "Could you add\nChange-Id: Ib6a3df46e46619248d2e45d71622109d3085eb64\nto the commit message?",
+      "revId": "9157334d015b4ccc04a2ea16df9b458a7bdbf995",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": true
+    }
+  ]
+}
