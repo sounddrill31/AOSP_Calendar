@@ -13,6 +13,8 @@ LOCAL_JACK_COVERAGE_INCLUDE_FILTER := com.android.calendar.*
 
 LOCAL_MODULE_TAGS := optional
 
+LOCAL_MODULE_PATH := $(TARGET_OUT_APPS)
+
 LOCAL_SRC_FILES := $(call all-java-files-under,$(src_dirs))
 
 # bundled
@@ -28,7 +30,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := \
         colorpicker \
         android-opt-datetimepicker \
         android-opt-timezonepicker \
-        android-support-v4 \
+        androidx.legacy_legacy-support-v4 \
         calendar-common
 
 LOCAL_SDK_VERSION := current
