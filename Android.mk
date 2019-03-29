@@ -13,6 +13,8 @@ LOCAL_JACK_COVERAGE_INCLUDE_FILTER := com.android.calendar.*
 
 LOCAL_MODULE_TAGS := optional
 
+LOCAL_MODULE_PATH := $(TARGET_OUT_APPS)
+
 LOCAL_SRC_FILES := $(call all-java-files-under,$(src_dirs))
 
 # bundled
