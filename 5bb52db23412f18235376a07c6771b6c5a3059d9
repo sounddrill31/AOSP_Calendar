@@ -1,0 +1,11 @@
+Open-Source-Licensing+2: Bob Badour <bbadour@google.com>
+Open-Source-Licensing+2: Raman Tenneti <rtenneti@google.com>
+Autosubmit+1: Bob Badour <bbadour@google.com>
+Code-Review+2: Raman Tenneti <rtenneti@google.com>
+Presubmit-Verified+1: Treehugger Robot <treehugger-gerrit@google.com>
+Lint+1: Lint 🤖 <android-build-prod-ayeaye@system.gserviceaccount.com>
+Submitted-by: Treehugger Robot <treehugger-gerrit@google.com>
+Submitted-at: Wed, 29 Apr 2020 03:53:45 +0000
+Reviewed-on: https://android-review.googlesource.com/c/platform/packages/apps/Calendar/+/1296923
+Project: platform/packages/apps/Calendar
+Branch: refs/heads/master
