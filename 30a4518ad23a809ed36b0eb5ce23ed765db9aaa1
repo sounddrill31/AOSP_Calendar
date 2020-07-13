@@ -16,6 +16,24 @@
       "revId": "30a4518ad23a809ed36b0eb5ce23ed765db9aaa1",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "659568fa_cadb4016",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1081223
+      },
+      "writtenOn": "2020-07-13T17:11:19Z",
+      "side": 1,
+      "message": "It would be great if it fixed other apps/libs as well, it\u0027s pretty spammy.\nSee frameworks/opt/photoviewer for example\nXin: can you do something?",
+      "parentUuid": "8fc01534_e08f34cd",
+      "revId": "30a4518ad23a809ed36b0eb5ce23ed765db9aaa1",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889",
+      "unresolved": false
     }
   ]
 }
