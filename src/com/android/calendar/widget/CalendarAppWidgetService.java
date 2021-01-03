@@ -541,17 +541,20 @@ public class CalendarAppWidgetService extends RemoteViewsService {
                     sLastUpdateTime = time.toMillis(true);
                 }
 
-                AppWidgetManager widgetManager = AppWidgetManager.getInstance(mContext);
-                if (widgetManager == null) {
-                    return;
-                }
-                if (mAppWidgetId == -1) {
-                    int[] ids = widgetManager.getAppWidgetIds(CalendarAppWidgetProvider
-                            .getComponentName(mContext));
+                if (CalendarAppWidgetProvider.isWidgetSupported(mContext)) {
+                    AppWidgetManager widgetManager = AppWidgetManager.getInstance(mContext);
+                    if (widgetManager == null) {
+                        return;
+                    }
+                    if (mAppWidgetId == -1) {
+                        int[] ids = widgetManager.getAppWidgetIds(CalendarAppWidgetProvider
+                                .getComponentName(mContext));
 
-                    widgetManager.notifyAppWidgetViewDataChanged(ids, R.id.events_list);
-                } else {
-                    widgetManager.notifyAppWidgetViewDataChanged(mAppWidgetId, R.id.events_list);
+                        widgetManager.notifyAppWidgetViewDataChanged(ids, R.id.events_list);
+                    } else {
+                        widgetManager.notifyAppWidgetViewDataChanged(mAppWidgetId,
+                                R.id.events_list);
+                    }
                 }
             }
         }
