@@ -1,0 +1,69 @@
+
+
+// Include res dir from chips
+chips_dir = ["../../../frameworks/opt/chips/res"]
+color_picker_dir = ["../../../frameworks/opt/colorpicker/res"]
+timezonepicker_dir = ["../../../frameworks/opt/timezonepicker/res"]
+res_dirs = chips_dir + color_picker_dir + timezonepicker_dir + ["res"]
+src_dirs = ["src"]
+android_app {
+    name: "Calendar",
+
+    jacoco: {
+        include_filter: ["com.android.calendar.*"],
+    },
+
+    srcs: [
+        "<'src_dirs'/**/*.java",
+        "unset>/**/*.java",
+    ],
+
+    // bundled
+    //LOCAL_STATIC_JAVA_LIBRARIES +=
+    //#        android-common
+    //#        libchips
+    //#        calendar-common
+
+    // unbundled
+    static_libs: [
+        "android-common",
+        "libchips",
+        "colorpicker",
+        "android-opt-timezonepicker",
+        "androidx.legacy_legacy-support-v4",
+        "calendar-common",
+    ],
+
+    sdk_version: "current",
+
+    // ANDROIDMK TRANSLATION ERROR: Only $(LOCAL_PATH)/.. values are allowed
+    // LOCAL_RESOURCE_DIR := $(addprefix $(LOCAL_PATH)/, $(res_dirs))
+
+    // ANDROIDMK TRANSLATION ERROR: unsupported assignment to LOCAL_LICENSE_KINDS
+    // LOCAL_LICENSE_KINDS := SPDX-license-identifier-Apache-2.0
+
+    // ANDROIDMK TRANSLATION ERROR: unsupported assignment to LOCAL_LICENSE_CONDITIONS
+    // LOCAL_LICENSE_CONDITIONS := notice
+
+    notice: LOCAL_PATH + "/NOTICE",
+
+    optimize: {
+        proguard_flags_files: ["proguard.flags"],
+    },
+
+    product_specific: true,
+
+    aaptflags: ["--auto-add-overlay"] + [
+        "--extra-packages",
+        "com.android.ex.chips",
+    ] + [
+        "--extra-packages",
+        "com.android.colorpicker",
+    ] + [
+        "--extra-packages",
+        "com.android.timezonepicker",
+    ],
+
+}
+
+// Use the following include to make our test apk.
