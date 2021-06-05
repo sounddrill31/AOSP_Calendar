@@ -19,8 +19,7 @@ license {
 exclude_srcsd = []
 
 exclude_srcsm = [
-  "src/**/calendar/GoogleCalendarUriIntentFilter.java",
-  "src/**/calendar/temp.kt",
+    "src/**/calendar/GoogleCalendarUriIntentFilter.java",
 ]
 
 android_app {
