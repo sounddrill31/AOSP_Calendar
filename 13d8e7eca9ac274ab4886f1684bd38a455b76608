@@ -1,0 +1,30 @@
+{
+  "comments": [
+    {
+      "robotId": "ayeaye",
+      "robotRunId": "AR00000000000011614791",
+      "url": "https://android-build.googleplex.com/builds/treetop/android-review/1732473?revision\u003d3",
+      "fixSuggestions": [],
+      "key": {
+        "uuid": "6139485f_dc00a29c",
+        "filename": "src/com/android/calendar/CalendarBackupAgent.kt",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1757831
+      },
+      "writtenOn": "2021-06-09T20:12:56Z",
+      "side": 1,
+      "message": "Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 32,
+        "startChar": 71,
+        "endLine": 32,
+        "endChar": 72
+      },
+      "revId": "13d8e7eca9ac274ab4886f1684bd38a455b76608",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
