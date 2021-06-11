@@ -1,0 +1,108 @@
+{
+  "comments": [
+    {
+      "robotId": "ayeaye",
+      "robotRunId": "AR00000000000011692676",
+      "url": "https://android-build.googleplex.com/builds/treetop/android-review/1735394?revision\u003d2",
+      "fixSuggestions": [],
+      "key": {
+        "uuid": "a6f2ed1e_013df20a",
+        "filename": "src/com/android/calendar/EventGeometry.kt",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1757831
+      },
+      "writtenOn": "2021-06-11T21:40:43Z",
+      "side": 1,
+      "message": "Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 98,
+        "startChar": 83,
+        "endLine": 98,
+        "endChar": 84
+      },
+      "revId": "617b13ec3f87d5c5dead2193ed61c63148469655",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "robotId": "ayeaye",
+      "robotRunId": "AR00000000000011692676",
+      "url": "https://android-build.googleplex.com/builds/treetop/android-review/1735394?revision\u003d2",
+      "fixSuggestions": [],
+      "key": {
+        "uuid": "51a99bf1_601b466e",
+        "filename": "src/com/android/calendar/MultiStateButton.kt",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1757831
+      },
+      "writtenOn": "2021-06-11T21:40:43Z",
+      "side": 1,
+      "message": "Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 31,
+        "startChar": 68,
+        "endLine": 31,
+        "endChar": 69
+      },
+      "revId": "617b13ec3f87d5c5dead2193ed61c63148469655",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "robotId": "ayeaye",
+      "robotRunId": "AR00000000000011692676",
+      "url": "https://android-build.googleplex.com/builds/treetop/android-review/1735394?revision\u003d2",
+      "fixSuggestions": [],
+      "key": {
+        "uuid": "617af0bf_2c3da702",
+        "filename": "src/com/android/calendar/MultiStateButton.kt",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1757831
+      },
+      "writtenOn": "2021-06-11T21:40:43Z",
+      "side": 1,
+      "message": "Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 32,
+        "startChar": 93,
+        "endLine": 32,
+        "endChar": 94
+      },
+      "revId": "617b13ec3f87d5c5dead2193ed61c63148469655",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "robotId": "ayeaye",
+      "robotRunId": "AR00000000000011692676",
+      "url": "https://android-build.googleplex.com/builds/treetop/android-review/1735394?revision\u003d2",
+      "fixSuggestions": [],
+      "key": {
+        "uuid": "ee7af8cd_058cd09a",
+        "filename": "src/com/android/calendar/MultiStateButton.kt",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1757831
+      },
+      "writtenOn": "2021-06-11T21:40:43Z",
+      "side": 1,
+      "message": "Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 36,
+        "startChar": 80,
+        "endLine": 36,
+        "endChar": 81
+      },
+      "revId": "617b13ec3f87d5c5dead2193ed61c63148469655",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
