@@ -2572,7 +2572,7 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
             // event rectangle.
             event.left = computeDayLeftPosition(startIndex);
             event.right = computeDayLeftPosition(endIndex + 1) - DAY_GAP;
-            event.top = y + height * event.getColumn();
+            event.top = y + height * event.column;
             event.bottom = event.top + height - ALL_DAY_EVENT_RECT_BOTTOM_MARGIN;
             if (mMaxAlldayEvents > mMaxUnexpandedAlldayEventCount) {
                 // check if we should skip this event. We skip if it starts
@@ -2686,14 +2686,14 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
         // event, if any.
         int startPosition = -1;
         if (mPrevSelectedEvent != null && mPrevSelectedEvent.drawAsAllday()) {
-            startPosition = mPrevSelectedEvent.getColumn();
+            startPosition = mPrevSelectedEvent.column;
         }
         int maxPosition = -1;
         Event startEvent = null;
         Event maxPositionEvent = null;
         for (int ii = 0; ii < len; ii++) {
             Event ev = mSelectedEvents.get(ii);
-            int position = ev.getColumn();
+            int position = ev.column;
             if (position == startPosition) {
                 startEvent = ev;
             } else if (position > maxPosition) {
@@ -2705,7 +2705,7 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
                     continue;
                 }
                 Event neighbor = mSelectedEvents.get(jj);
-                int neighborPosition = neighbor.getColumn();
+                int neighborPosition = neighbor.column;
                 if (neighborPosition == position - 1) {
                     ev.nextUp = neighbor;
                 } else if (neighborPosition == position + 1) {
@@ -3644,7 +3644,7 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
             for (int i = 0; i < numEvents; i++) {
                 Event event = events.get(i);
                 if (!event.drawAsAllday() ||
-                        (!mShowAllAllDayEvents && event.getColumn() >= maxUnexpandedColumn)) {
+                        (!mShowAllAllDayEvents && event.column >= maxUnexpandedColumn)) {
                     // Don't check non-allday events or events that aren't shown
                     continue;
                 }
@@ -3656,7 +3656,7 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
                     if (height > MAX_HEIGHT_OF_ONE_ALLDAY_EVENT) {
                         height = MAX_HEIGHT_OF_ONE_ALLDAY_EVENT;
                     }
-                    float eventTop = yOffset + height * event.getColumn();
+                    float eventTop = yOffset + height * event.column;
                     float eventBottom = eventTop + height;
                     if (eventTop < y && eventBottom > y) {
                         // If the touch is inside the event rectangle, then
