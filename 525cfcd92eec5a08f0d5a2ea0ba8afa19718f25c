@@ -1,0 +1,56 @@
+{
+  "comments": [
+    {
+      "robotId": "ayeaye",
+      "robotRunId": "AR00000000000012480081",
+      "url": "https://android-build.googleplex.com/builds/treetop/android-review/1751546?revision\u003d3",
+      "fixSuggestions": [],
+      "key": {
+        "uuid": "c47b42d0_99eaaa45",
+        "filename": "src/com/android/calendar/month/SimpleDayPickerFragment.kt",
+        "patchSetId": 3
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1757831
+      },
+      "writtenOn": "2021-06-29T20:09:45Z",
+      "side": 1,
+      "message": "Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 319,
+        "startChar": 78,
+        "endLine": 319,
+        "endChar": 79
+      },
+      "revId": "525cfcd92eec5a08f0d5a2ea0ba8afa19718f25c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "robotId": "ayeaye",
+      "robotRunId": "AR00000000000012480081",
+      "url": "https://android-build.googleplex.com/builds/treetop/android-review/1751546?revision\u003d3",
+      "fixSuggestions": [],
+      "key": {
+        "uuid": "41f318f6_429d0f1e",
+        "filename": "src/com/android/calendar/month/SimpleDayPickerFragment.kt",
+        "patchSetId": 3
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1757831
+      },
+      "writtenOn": "2021-06-29T20:09:45Z",
+      "side": 1,
+      "message": "Please remove the trailing whitespace.",
+      "range": {
+        "startLine": 448,
+        "startChar": 84,
+        "endLine": 448,
+        "endChar": 85
+      },
+      "revId": "525cfcd92eec5a08f0d5a2ea0ba8afa19718f25c",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
