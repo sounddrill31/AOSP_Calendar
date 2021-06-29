@@ -83,7 +83,7 @@ class MonthByWeekFragment @JvmOverloads constructor(
             mFirstVisibleDay.timezone = tz
             mFirstVisibleDay.normalize(true)
             if (mAdapter != null) {
-                mAdapter.refresh()
+                mAdapter?.refresh()
             }
         }
     }
@@ -129,7 +129,7 @@ class MonthByWeekFragment @JvmOverloads constructor(
      * @return The new Uri to use
      */
     private fun updateUri(): Uri {
-        val child: SimpleWeekView? = mListView.getChildAt(0) as? SimpleWeekView
+        val child: SimpleWeekView? = mListView?.getChildAt(0) as? SimpleWeekView
         if (child != null) {
             val julianDay: Int = child?.getFirstJulianDay()
             mFirstLoadedJulianDay = julianDay
@@ -191,7 +191,7 @@ class MonthByWeekFragment @JvmOverloads constructor(
         super.onAttach(activity)
         mTZUpdater.run()
         if (mAdapter != null) {
-            mAdapter.setSelectedDay(mSelectedDay)
+            mAdapter?.setSelectedDay(mSelectedDay)
         }
         mIsDetached = false
         val viewConfig: ViewConfiguration = ViewConfiguration.get(activity)
@@ -212,7 +212,7 @@ class MonthByWeekFragment @JvmOverloads constructor(
         super.onDetach()
         if (mShowCalendarControls) {
             if (mListView != null) {
-                mListView.removeCallbacks(mLoadingRunnable)
+                mListView?.removeCallbacks(mLoadingRunnable)
             }
         }
     }
@@ -233,11 +233,11 @@ class MonthByWeekFragment @JvmOverloads constructor(
         weekParams.put(SimpleWeeksAdapter.WEEK_PARAMS_DAYS_PER_WEEK, mDaysPerWeek)
         if (mAdapter == null) {
             mAdapter = MonthByWeekAdapter(getActivity(), weekParams)
-            mAdapter.registerDataSetObserver(mObserver)
+            mAdapter?.registerDataSetObserver(mObserver)
         } else {
-            mAdapter.updateParams(weekParams)
+            mAdapter?.updateParams(weekParams)
         }
-        mAdapter.notifyDataSetChanged()
+        mAdapter?.notifyDataSetChanged()
     }
 
     @Override
@@ -259,20 +259,20 @@ class MonthByWeekFragment @JvmOverloads constructor(
     @Override
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        mListView.setSelector(StateListDrawable())
-        mListView.setOnTouchListener(this)
+        mListView?.setSelector(StateListDrawable())
+        mListView?.setOnTouchListener(this)
         if (!mIsMiniMonth) {
-            mListView.setBackgroundColor(getResources().getColor(R.color.month_bgcolor))
+            mListView?.setBackgroundColor(getResources().getColor(R.color.month_bgcolor))
         }
 
         // To get a smoother transition when showing this fragment, delay loading of events until
         // the fragment is expended fully and the calendar controls are gone.
         if (mShowCalendarControls) {
-            mListView.postDelayed(mLoadingRunnable, mEventsLoadingDelay.toLong())
+            mListView?.postDelayed(mLoadingRunnable, mEventsLoadingDelay.toLong())
         } else {
             mLoader = getLoaderManager().initLoader(0, null, this) as CursorLoader
         }
-        mAdapter.setListView(mListView)
+        mAdapter?.setListView(mListView)
     }
 
     @Override
@@ -326,7 +326,7 @@ class MonthByWeekFragment @JvmOverloads constructor(
         }
         mDaysPerWeek = Utils.getDaysPerWeek(mContext)
         updateHeader()
-        mAdapter.setSelectedDay(mSelectedDay)
+        mAdapter?.setSelectedDay(mSelectedDay)
         mTZUpdater.run()
         mTodayUpdater.run()
         goTo(mSelectedDay.toMillis(true), false, true, false)
@@ -404,7 +404,7 @@ class MonthByWeekFragment @JvmOverloads constructor(
                     @Override
                     override fun run() {
                         (mAdapter as MonthByWeekAdapter).animateToday()
-                        mAdapter.notifyDataSetChanged()
+                        mAdapter?.notifyDataSetChanged()
                     }
                 }, if (delayAnimation) GOTO_SCROLL_DURATION.toLong() else 0L)
             }
@@ -420,13 +420,13 @@ class MonthByWeekFragment @JvmOverloads constructor(
             var useSelected = false
             if (time.year == mDesiredDay.year && time.month === mDesiredDay.month) {
                 mSelectedDay.set(mDesiredDay)
-                mAdapter.setSelectedDay(mDesiredDay)
+                mAdapter?.setSelectedDay(mDesiredDay)
                 useSelected = true
             } else {
                 mSelectedDay.set(time)
-                mAdapter.setSelectedDay(time)
+                mAdapter?.setSelectedDay(time)
             }
-            val controller: CalendarController = CalendarController.getInstance(mContext)
+            val controller: CalendarController = CalendarController.getInstance(mContext as Context)
             if (mSelectedDay.minute >= 30) {
                 mSelectedDay.minute = 30
             } else {
