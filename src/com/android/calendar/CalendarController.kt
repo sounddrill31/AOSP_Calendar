@@ -33,19 +33,19 @@ import java.util.LinkedHashMap
 import java.util.LinkedList
 import java.util.WeakHashMap
 
-class CalendarController private constructor(context: Context) {
+class CalendarController private constructor(context: Context?) {
     private var mContext: Context? = null
 
     // This uses a LinkedHashMap so that we can replace fragments based on the
     // view id they are being expanded into since we can't guarantee a reference
     // to the handler will be findable
-    private val eventHandlers: LinkedHashMap<Integer, EventHandler> =
-        LinkedHashMap<Integer, EventHandler>(5)
-    private val mToBeRemovedEventHandlers: LinkedList<Integer> = LinkedList<Integer>()
-    private val mToBeAddedEventHandlers: LinkedHashMap<Integer, EventHandler> =
-        LinkedHashMap<Integer, EventHandler>()
-    private var mFirstEventHandler: Pair<Integer, EventHandler>? = null
-    private var mToBeAddedFirstEventHandler: Pair<Integer, EventHandler>? = null
+    private val eventHandlers: LinkedHashMap<Int, EventHandler> =
+        LinkedHashMap<Int, EventHandler>(5)
+    private val mToBeRemovedEventHandlers: LinkedList<Int> = LinkedList<Int>()
+    private val mToBeAddedEventHandlers: LinkedHashMap<Int, EventHandler> =
+        LinkedHashMap<Int, EventHandler>()
+    private var mFirstEventHandler: Pair<Int, EventHandler>? = null
+    private var mToBeAddedFirstEventHandler: Pair<Int, EventHandler>? = null
 
     @Volatile
     private var mDispatchInProgressCounter = 0
@@ -509,10 +509,10 @@ class CalendarController private constructor(context: Context) {
                     handled = true
                 }
             }
-            val handlers: MutableIterator<MutableMap.MutableEntry<Integer,
+            val handlers: MutableIterator<MutableMap.MutableEntry<Int,
                 CalendarController.EventHandler>> = eventHandlers.entries.iterator()
             while (handlers.hasNext()) {
-                val entry: MutableMap.MutableEntry<Integer,
+                val entry: MutableMap.MutableEntry<Int,
                     CalendarController.EventHandler> = handlers.next()
                 val key: Int = entry.key.toInt()
                 val temp4 = mFirstEventHandler
@@ -523,7 +523,7 @@ class CalendarController private constructor(context: Context) {
                 val eventHandler: EventHandler = entry.value
                 if (eventHandler != null &&
                     eventHandler.supportedEventTypes and event.eventType != 0L) {
-                    if (mToBeRemovedEventHandlers.contains(key as Integer)) {
+                    if (mToBeRemovedEventHandlers.contains(key)) {
                         continue
                     }
                     eventHandler.handleEvent(event)
@@ -565,7 +565,7 @@ class CalendarController private constructor(context: Context) {
      * @param key The view id or placeholder for this handler
      * @param eventHandler Typically a fragment or activity in the calendar app
      */
-    fun registerEventHandler(key: Integer, eventHandler: EventHandler?) {
+    fun registerEventHandler(key: Int, eventHandler: EventHandler?) {
         synchronized(this) {
             if (mDispatchInProgressCounter > 0) {
                 mToBeAddedEventHandlers.put(key,
@@ -576,18 +576,18 @@ class CalendarController private constructor(context: Context) {
         }
     }
 
-    fun registerFirstEventHandler(key: Integer, eventHandler: EventHandler?) {
+    fun registerFirstEventHandler(key: Int, eventHandler: EventHandler?) {
         synchronized(this) {
             registerEventHandler(key, eventHandler)
             if (mDispatchInProgressCounter > 0) {
-                mToBeAddedFirstEventHandler = Pair<Integer, EventHandler>(key, eventHandler)
+                mToBeAddedFirstEventHandler = Pair<Int, EventHandler>(key, eventHandler)
             } else {
-                mFirstEventHandler = Pair<Integer, EventHandler>(key, eventHandler)
+                mFirstEventHandler = Pair<Int, EventHandler>(key, eventHandler)
             }
         }
     }
 
-    fun deregisterEventHandler(key: Integer) {
+    fun deregisterEventHandler(key: Int) {
         synchronized(this) {
             if (mDispatchInProgressCounter > 0) {
                 // To avoid ConcurrencyException, stash away the event handler for now.
@@ -704,7 +704,7 @@ class CalendarController private constructor(context: Context) {
          *
          * @param context The activity if at all possible.
          */
-        @JvmStatic fun getInstance(context: Context): CalendarController {
+        @JvmStatic fun getInstance(context: Context?): CalendarController? {
             synchronized(instances) {
                 var controller: CalendarController? = null
                 val weakController: WeakReference<CalendarController>? = instances.get(context)
