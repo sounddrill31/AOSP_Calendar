@@ -29,7 +29,11 @@ exclude_srcsd = [
     "src/**/calendar/alerts/QuickResponseActivity.java",
     "src/**/calendar/month/MonthByWeekFragment.java",
     "src/**/calendar/widget/CalendarAppWidgetModel.java",
+<<<<<<< HEAD   (514055 AOSP/Calendar - CalendarAppWidgetService fully converted wit)
     "src/**/calendar/widget/CalendarAppWidgetService.java",
+=======
+    "src/**/calendar/widget/CalendarAppWidgetProvider.java",
+>>>>>>> BRANCH (33057f Merge changes from topic "CalendarAppWidgetProvider")
     "src/**/calendar/CalendarController.java",
     "src/**/calendar/DayOfMonthDrawable.java",
     "src/**/calendar/Event.java",
