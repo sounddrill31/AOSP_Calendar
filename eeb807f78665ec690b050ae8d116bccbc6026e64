@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "robotId": "ayeaye",
+      "robotRunId": "AR00000000000012753761",
+      "url": "https://android-build.googleplex.com/builds/treetop/android-review/1755669?revision\u003d3",
+      "fixSuggestions": [
+        {
+          "fixId": "3bd3567f_7e74878d",
+          "description": "Change to \"src/com/android/calendar/DayView.kt\"",
+          "replacements": [
+            {
+              "path": "src/com/android/calendar/DayView.kt",
+              "range": {
+                "startLine": 544,
+                "startChar": 20,
+                "endLine": 544,
+                "endChar": 28
+              },
+              "replacement": "visible"
+            }
+          ]
+        }
+      ],
+      "key": {
+        "uuid": "7c246bc8_4bed064b",
+        "filename": "src/com/android/calendar/DayView.kt",
+        "patchSetId": 3
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 1757831
+      },
+      "writtenOn": "2021-07-03T13:48:12Z",
+      "side": 1,
+      "message": "Common typo found: \"visibile\" -- should it be \"visible\"?\nNote: a line containing \"common_typos_disable\" or \"common_typos_enable\" will turn off or on (respectively) the linter for subsequent lines in the file. Alternatively include the token \"NOTYPO\" within a line to skip typo linting that line or include \u0027No-Typo-Check: \u003creason\u003e\u0027in the commit message.",
+      "range": {
+        "startLine": 544,
+        "startChar": 20,
+        "endLine": 544,
+        "endChar": 28
+      },
+      "revId": "eeb807f78665ec690b050ae8d116bccbc6026e64",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "robotId": "ayeaye",
+      "robotRunId": "AR00000000000012753761",
+      "url": "https://android-build.googleplex.com/builds/treetop/android-review/1755669?revision\u003d3",
+      "fixSuggestions": [
+        {
+          "fixId": "fe38845a_10682ebd",
+          "description": "Change to \"src/com/android/calendar/DayView.kt\"",
+          "replacements": [
+            {
+              "path": "src/com/android/calendar/DayView.kt",
+              "range": {
+                "startLine": 2872,
+                "startChar": 61,
+                "endLine": 2872,
+                "endChar": 72
+              },
+              "replacement": "bigger than"
+            }
+          ]
+        }
+      ],
+      "key": {
+        "uuid": "cb342970_42c720d4",
+        "filename": "src/com/android/calendar/DayView.kt",
+        "patchSetId": 3
+      },
+      "lineNbr": 2872,
+      "author": {
+        "id": 1757831
+      },
+      "writtenOn": "2021-07-03T13:48:12Z",
+      "side": 1,
+      "message": "Common typo found: \"bigger then\" -- should it be \"bigger than\"?\nNote: a line containing \"common_typos_disable\" or \"common_typos_enable\" will turn off or on (respectively) the linter for subsequent lines in the file. Alternatively include the token \"NOTYPO\" within a line to skip typo linting that line or include \u0027No-Typo-Check: \u003creason\u003e\u0027in the commit message.",
+      "range": {
+        "startLine": 2872,
+        "startChar": 61,
+        "endLine": 2872,
+        "endChar": 72
+      },
+      "revId": "eeb807f78665ec690b050ae8d116bccbc6026e64",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
