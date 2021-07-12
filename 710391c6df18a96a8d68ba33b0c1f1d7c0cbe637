@@ -1,0 +1,47 @@
+{
+  "comments": [
+    {
+      "robotId": "ayeaye",
+      "robotRunId": "AR00000000000013095678",
+      "url": "https://android-build.googleplex.com/builds/treetop/android-review/1763707?revision\u003d1",
+      "fixSuggestions": [
+        {
+          "fixId": "f8c6458d_1bdca193",
+          "description": "Change to \"src/com/android/calendar/month/MonthWeekEventsView.kt\"",
+          "replacements": [
+            {
+              "path": "src/com/android/calendar/month/MonthWeekEventsView.kt",
+              "range": {
+                "startLine": 298,
+                "startChar": 39,
+                "endLine": 298,
+                "endChar": 45
+              },
+              "replacement": "LENGTH"
+            }
+          ]
+        }
+      ],
+      "key": {
+        "uuid": "50faf97f_9d1a2d47",
+        "filename": "src/com/android/calendar/month/MonthWeekEventsView.kt",
+        "patchSetId": 1
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1757831
+      },
+      "writtenOn": "2021-07-12T18:39:38Z",
+      "side": 1,
+      "message": "Common typo found: \"LENGHT\" -- should it be \"LENGTH\"?\nNote: a line containing \"common_typos_disable\" or \"common_typos_enable\" will turn off or on (respectively) the linter for subsequent lines in the file. Alternatively include the token \"NOTYPO\" within a line to skip typo linting that line or include \u0027No-Typo-Check: \u003creason\u003e\u0027in the commit message.",
+      "range": {
+        "startLine": 298,
+        "startChar": 39,
+        "endLine": 298,
+        "endChar": 45
+      },
+      "revId": "710391c6df18a96a8d68ba33b0c1f1d7c0cbe637",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
