@@ -44,6 +44,10 @@ android_app {
         "calendar-common",
     ],
 
+    kotlincflags: [
+        // TODO(b/237017037): remove this once the UNEXPECTED_SAFE_CALL warnings are fixed.
+        "-language-version 1.6",
+    ],
     sdk_version: "current",
     target_sdk_version: "30",
     optimize: {
