@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92be1f0a_9c21646a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1043346
+      },
+      "writtenOn": "2022-09-07T08:08:25Z",
+      "side": 1,
+      "message": "I got the log message in landscape mode.\n\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n09-07 07:18:36.580  3027  3027 E AndroidRuntime: Caused by: java.lang.ClassCastException: kotlin.Unit cannot be cast to android.widget.RelativeLayout$LayoutParams\n09-07 07:18:36.580  3027  3027 E AndroidRuntime: \tat com.android.calendar.AllInOneActivity.onCreate(AllInOneActivity.kt:295)",
+      "revId": "ed06223d6373d1980a6e8cfce8d38e0b6805cf29",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
