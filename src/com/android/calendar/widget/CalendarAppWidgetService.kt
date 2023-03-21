@@ -24,6 +24,7 @@ import android.content.CursorLoader
 import android.content.Intent
 import android.content.Loader
 import android.content.res.Resources
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
@@ -542,6 +543,10 @@ class CalendarAppWidgetService : RemoteViewsService() {
                         mContext?.sendBroadcast(updateIntent)
                     }
                     sLastUpdateTime = time.toMillis(true)
+                }
+                if (mContext?.packageManager?.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE) ?: false) {
+                    Log.d(TAG, "AppWidgetManager is not supported on automotive builds");
+                    return;
                 }
                 val widgetManager: AppWidgetManager = AppWidgetManager.getInstance(mContext)
                 if (widgetManager == null) {
