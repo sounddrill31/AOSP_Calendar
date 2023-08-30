@@ -16,6 +16,24 @@
       "message": "I hope Calendar app was tested.",
       "revId": "16b7a02cfdf8938db4d055e12d6f2a4f3f19a4b5",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d360af8e_a6ac313b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1989070
+      },
+      "writtenOn": "2023-08-30T02:13:27Z",
+      "side": 1,
+      "message": "This permission doesn\u0027t guard any code now -- on V+\nSo this is a no-op change.",
+      "parentUuid": "bff5cf0c_2122c0c0",
+      "revId": "16b7a02cfdf8938db4d055e12d6f2a4f3f19a4b5",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
     }
   ]
 }
