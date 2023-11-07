@@ -1,0 +1,22 @@
+package {
+    // See: http://go/android-license-faq
+    default_applicable_licenses: [
+        "packages_apps_Calendar_license",
+    ],
+}
+
+android_test {
+    name: "CalendarTests",
+    jacoco: {
+        include_filter: ["com.android.calendar.*"],
+    },
+    srcs: ["src/**/*.java"],
+    instrumentation_for: "Calendar",
+    // unbundled
+    static_libs: ["android-common"],
+    sdk_version: "16",
+    // Test needed artifacts
+    data: [
+        ":Calendar",
+    ],
+}
