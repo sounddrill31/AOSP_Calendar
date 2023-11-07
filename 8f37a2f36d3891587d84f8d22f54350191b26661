@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a2b52e6_d998e333",
+        "filename": "tests/Android.bp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1311067
+      },
+      "writtenOn": "2023-11-07T09:40:29Z",
+      "side": 1,
+      "message": "Should also AOSP copyright on the head of the file.",
+      "revId": "8f37a2f36d3891587d84f8d22f54350191b26661",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
