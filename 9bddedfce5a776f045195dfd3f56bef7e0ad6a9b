@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "79228926_4461a68f",
+        "filename": "tests/Android.bp",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1308044
+      },
+      "writtenOn": "2023-11-07T06:14:18Z",
+      "side": 1,
+      "message": "On, this is automatically generate by androidmk, let me double check if we should update the format it output by ourselves, thanks.",
+      "parentUuid": "8a8c7335_e2e20788",
+      "revId": "9bddedfce5a776f045195dfd3f56bef7e0ad6a9b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0a32117a_d5afe38a",
         "filename": "tests/Android.bp",
         "patchSetId": 2
