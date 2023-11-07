@@ -36,6 +36,24 @@
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c9c8a57_4ce9c724",
+        "filename": "tests/Android.bp",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1308044
+      },
+      "writtenOn": "2023-11-07T06:55:35Z",
+      "side": 1,
+      "message": "Just update, Thanks.",
+      "parentUuid": "79228926_4461a68f",
+      "revId": "9bddedfce5a776f045195dfd3f56bef7e0ad6a9b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a32117a_d5afe38a",
@@ -49,6 +67,30 @@
       "writtenOn": "2023-11-07T06:09:29Z",
       "side": 1,
       "message": "nit: Remove these comments.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 35
+      },
+      "revId": "9bddedfce5a776f045195dfd3f56bef7e0ad6a9b",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67561800_b21b9b38",
+        "filename": "tests/Android.bp",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1308044
+      },
+      "writtenOn": "2023-11-07T06:55:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a32117a_d5afe38a",
       "range": {
         "startLine": 14,
         "startChar": 0,
