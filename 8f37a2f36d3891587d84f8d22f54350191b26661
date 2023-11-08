@@ -16,6 +16,24 @@
       "message": "Should also AOSP copyright on the head of the file.",
       "revId": "8f37a2f36d3891587d84f8d22f54350191b26661",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34fa24ab_81d45055",
+        "filename": "tests/Android.bp",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1308044
+      },
+      "writtenOn": "2023-11-08T01:18:08Z",
+      "side": 1,
+      "message": "Thanks, just added.",
+      "parentUuid": "0a2b52e6_d998e333",
+      "revId": "8f37a2f36d3891587d84f8d22f54350191b26661",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
     }
   ]
 }
