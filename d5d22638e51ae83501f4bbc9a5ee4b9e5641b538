@@ -1,5 +1,23 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b1c31a4_60ab9a61",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2007232
+      },
+      "writtenOn": "2023-11-10T01:21:56Z",
+      "side": 1,
+      "message": "https://developers.google.com/search/docs/crawling-indexing/control-what-you-share#remove-existing-content-from-google",
+      "revId": "d5d22638e51ae83501f4bbc9a5ee4b9e5641b538",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ],
   "submitRequirementResults": [
     {
       "submitRequirement": {
