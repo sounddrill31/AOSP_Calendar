@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07519b62_0b8bb75a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1086523
+      },
+      "writtenOn": "2024-06-20T19:13:32Z",
+      "side": 1,
+      "message": "Retry now that ag/27950241 is merged",
+      "revId": "e409f51aa2d039e3d2a4aec4b81956c99dd7fc58",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
