@@ -16,6 +16,23 @@
       "message": "Do tests pass? If so, LGTM.",
       "revId": "b3d05d849d2a52dde1a086d3c4d6d3289ddff8c0",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1159a3bb_4d303f9a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1307230
+      },
+      "writtenOn": "2024-06-24T17:00:52Z",
+      "side": 1,
+      "message": "Were the targets that broke on initial submit verified via go/abtd? - Please link those successful runs in the description.",
+      "revId": "b3d05d849d2a52dde1a086d3c4d6d3289ddff8c0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
     }
   ]
 }
