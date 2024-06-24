@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e8625b8_c8940880",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1338311
+      },
+      "writtenOn": "2024-06-24T16:51:50Z",
+      "side": 1,
+      "message": "Do tests pass? If so, LGTM.",
+      "revId": "b3d05d849d2a52dde1a086d3c4d6d3289ddff8c0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
