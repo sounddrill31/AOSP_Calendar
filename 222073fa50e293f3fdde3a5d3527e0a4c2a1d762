@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21266a2a_f2e8ba01",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1338311
+      },
+      "writtenOn": "2024-06-25T17:18:59Z",
+      "side": 1,
+      "message": "We got an exception to leave these test at version 19 (if I recall). +1 to keeping it at version 19.",
+      "revId": "222073fa50e293f3fdde3a5d3527e0a4c2a1d762",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    }
+  ]
+}
