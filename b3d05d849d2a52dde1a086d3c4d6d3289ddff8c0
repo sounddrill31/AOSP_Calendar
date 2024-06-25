@@ -33,6 +33,24 @@
       "message": "Were the targets that broke on initial submit verified via go/abtd? - Please link those successful runs in the description.",
       "revId": "b3d05d849d2a52dde1a086d3c4d6d3289ddff8c0",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c775e594_55a22737",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1955510
+      },
+      "writtenOn": "2024-06-25T05:37:38Z",
+      "side": 1,
+      "message": "Could you please verify https://android-build.corp.google.com/builds/abtd/run/L44200030004729421 ? Thank you !",
+      "parentUuid": "1159a3bb_4d303f9a",
+      "revId": "b3d05d849d2a52dde1a086d3c4d6d3289ddff8c0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
     }
   ]
 }
