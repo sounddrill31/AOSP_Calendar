@@ -87,6 +87,24 @@
       "parentUuid": "e444f51e_cca24f4f",
       "revId": "b3d05d849d2a52dde1a086d3c4d6d3289ddff8c0",
       "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0f7c7af_8b2b7c07",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1955510
+      },
+      "writtenOn": "2024-06-25T15:55:07Z",
+      "side": 1,
+      "message": "ABTD tests : aosp-main: https://android-build.corp.google.com/builds/abtd/run/L44200030004729421\n\naosp-main:  https://android-build.corp.google.com/builds/abtd/run/L18100030004738466\n\ngit_aosp-main-with-phones: https://android-build.corp.google.com/builds/abtd/run/L60100030004739621",
+      "parentUuid": "d7a2b8fc_a9ab283e",
+      "revId": "b3d05d849d2a52dde1a086d3c4d6d3289ddff8c0",
+      "serverId": "85c56323-6fa9-3386-8a01-6480fb634889"
     }
   ]
 }
