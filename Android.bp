@@ -25,7 +25,7 @@ android_app {
     },
 
     srcs: [
-        "src/**/*.kt",
+        "app/src/main/**/*.kt",
     ],
 
     // bundled
